@@ -63,12 +63,15 @@ function isValidSecret(Secret, UserId, AmountRequested)
 
     console.log(UserId);
     console.log(Secret);
-    const KeyIndex = parseInt(Secret.toString().charAt(1));
+    const dollarIndex = Secret.toString().indexOf('$');
+    const colonIndex = Secret.toString().indexOf(':');
+    const KeyIndex = Number(Secret.toString().substring(dollarIndex + 1, colonIndex));
+    const KeyValue = parseInt(UserId.toString()[KeyIndex]);
     console.log(KeyIndex);
-    const Key = Math.min(Math.max(UserId.toString().charAt(KeyIndex), 3), 9);
+    console.log(KeyValue);
+    const stripped = Secret.substring(colonIndex + 1)
+    const Key = Math.min(Math.max(KeyValue, 3), 9);
     console.log(Key);
-
-    const stripped = Secret.substring(3)
     console.log(stripped);
 
     let DecodedSecret = "";
@@ -215,7 +218,7 @@ app.post('/update', async (req, res) => {
         conn = await pool.getConnection();
         const currentValueRows = await conn.query('SELECT Currency FROM users WHERE UserId = ? LIMIT 1', [userId]);
         const currencyValue = Number(currentValueRows[0].Currency);
-        if (!currencyValue || isNaN(currencyValue)) {
+        if (isNaN(currencyValue)) {
             return res.status(400).json({error: "currencyValue must be valid"});
         }
 
@@ -224,8 +227,8 @@ app.post('/update', async (req, res) => {
         res.status(200).json({message: "Updated user info"});
     }
     catch (err){
+        console.log(err.message);
         res.status(500).json({error: `Failed to effect user currency: ${err.message}!`});
-
         // Append failure to update currency value of user as this can easily lead to lost winnings/losses/withdrawals/deposits
         fs.appendFile(path.join(__dirname, 'casino.log'),
     `Failed to update currency by < ${amount} > amount for user: ${userId}`, (err) => {
