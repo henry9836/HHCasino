@@ -76,7 +76,7 @@ local headers = {
     ["Content-Type"] = "application/json"
 }
 
-local response = http.post(url.."/update", jsonText, headers)
+local response = http.post(URL.."/update", jsonText, headers)
 if response then
     local status = response.getResponseCode()
     local body = response.readAll()
@@ -86,7 +86,7 @@ else
     print("Request failed.")
 end
 
-response = http.get(url.."/get-currency/"..userId)
+response = http.get(URL.."/get-currency/"..userId)
 if response then
     local status = response.getResponseCode()
     local body = response.readAll()
