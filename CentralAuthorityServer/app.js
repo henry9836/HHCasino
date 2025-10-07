@@ -211,7 +211,7 @@ app.post('/update', async (req, res) => {
         return res.status(400).json({error: "Unknown Error"});
     }
 
-    // Add new user to db
+    // Add money to new user
     let conn;
     try
     {

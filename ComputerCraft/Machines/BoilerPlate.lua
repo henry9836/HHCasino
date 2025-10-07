@@ -76,8 +76,8 @@ local headers = {
     ["Content-Type"] = "application/json"
 }
 
-print("Attempting to add cash money")
-local response = http.post(URL.."/update", jsonText, headers)
+print("Attempting to create new user")
+local response = http.get(URL.."/register")
 if response then
     local status = response.getResponseCode()
     local body = response.readAll()
@@ -86,6 +86,19 @@ if response then
 else
     print("Request failed.")
 end
+reponse.close()
+
+print("Attempting to add cash money")
+response = http.post(URL.."/update", jsonText, headers)
+if response then
+    local status = response.getResponseCode()
+    local body = response.readAll()
+    print("Status:", status)
+    print("Response:", body)
+else
+    print("Request failed.")
+end
+response.close()
 
 print("Checking our balance")
 response = http.get(URL.."/get-currency/"..userId)
@@ -97,5 +110,6 @@ if response then
 else
     print("Request failed.")
 end
+response.close()
 
 print("end")
