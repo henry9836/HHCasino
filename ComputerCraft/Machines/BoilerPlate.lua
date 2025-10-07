@@ -1,7 +1,7 @@
 -- Load secrets
-local secretsFile = fs.open("secret.env")
+local secretsFile = fs.open("config/secret.env", "r")
 local secretContent = secretsFile.readAll()
-secretContent.close()
+secretsFile.close()
 
 local secrets = textutils.unserialiseJSON(secretContent)
 
