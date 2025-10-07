@@ -1,10 +1,9 @@
 -- Load secrets
-local json = require("cc.data")
 local secretsFile = fs.open("secret.env")
 local secretContent = secretsFile.readAll()
 secretContent.close()
 
-local secrets = json.jsonDecode(secretContent)
+local secrets = textutils.unserialiseJSON(secretContent)
 
 local URL = secrets.url
 local SECRET = secrets.casinoSecret
