@@ -1,7 +1,18 @@
+-- Load secrets
+local json = require("cc.data")
+local secretsFile = fs.open("secret.env")
+local secretContent = secretsFile.readAll()
+secretContent.close()
+
+local secrets = json.jsonDecode(secretContent)
+
+local URL = secrets.url
+local SECRET = secrets.casinoSecret
+
 -- Define the HideMessage function in Lua
-function HideMessage(amountRequested, userId, envSecret)
+function HideMessage(amountRequested, userId)
     -- Concatenate EnvSecret with amountRequested
-    local secret = envSecret .. tostring(amountRequested)
+    local secret = SECRET .. tostring(amountRequested)
 
     -- Step 1: XOR Encryption
     local encryptedSecret = ""
@@ -53,18 +64,15 @@ end
 
 local userId = 1750222654637 -- Replace with actual userId
 local amount = 100 -- Replace with actual amount
-local envSecret = "TheDragonHoard" -- Replace with your EnvSecret
-
-local secret = HideMessage(amount, userId, envSecret)
+local message = HideMessage(amount, userId)
 
 local requestData = {
     userId = userId,
     amount = amount,
-    secret = secret
+    secret = message
 }
 
 local jsonText = textutils.serializeJSON(requestData)
-local url = "http://scuttlinglizard.ddns.net:3000" -- Replace with actual server URL
 local headers = {
     ["Content-Type"] = "application/json"
 }
