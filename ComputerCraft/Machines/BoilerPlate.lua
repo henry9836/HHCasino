@@ -86,7 +86,7 @@ if response then
 else
     print("Request failed.")
 end
-reponse.close()
+response.close()
 
 print("Attempting to add cash money")
 response = http.post(URL.."/update", jsonText, headers)
