@@ -83,10 +83,10 @@ if response then
     local body = response.readAll()
     print("Status:", status)
     print("Response:", body)
+    response.close()
 else
     print("Request failed.")
 end
-response.close()
 
 print("Attempting to add cash money")
 response = http.post(URL.."/update", jsonText, headers)
@@ -95,10 +95,10 @@ if response then
     local body = response.readAll()
     print("Status:", status)
     print("Response:", body)
+    response.close()
 else
     print("Request failed.")
 end
-response.close()
 
 print("Checking our balance")
 response = http.get(URL.."/get-currency/"..userId)
@@ -107,9 +107,9 @@ if response then
     local body = response.readAll()
     print("Status:", status)
     print("Response:", body)
+    response.close()
 else
     print("Request failed.")
 end
-response.close()
 
 print("end")
