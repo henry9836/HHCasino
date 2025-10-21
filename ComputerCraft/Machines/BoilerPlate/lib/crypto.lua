@@ -3,9 +3,9 @@
 
 local Crypto = {}
 
-function Crypto.hideMessage(amountRequested, userId)
+function Crypto.hideMessage(amountRequested, userId, key)
     -- Concatenate EnvSecret with amountRequested
-    local secret = SECRET .. tostring(amountRequested)
+    local secret = key .. tostring(amountRequested)
 
     -- Step 1: XOR Encryption
     local encryptedSecret = ""

@@ -22,7 +22,7 @@ if data.error then
     return
 end
 
-local message = crypto.hideMessage(250, userId)
+local message = crypto.hideMessage(250, userId, configSecret)
 if api.updateMoney(configUrl, userId, 250, message) then
     print("Successfull ran the test :3")
 else
