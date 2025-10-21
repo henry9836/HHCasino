@@ -49,6 +49,29 @@ function showMenu()
     clearScreen()
     print("=== Hade's Infernal Reserve Casino ATM ===")
     if isCardInserted() then
+        -- Quickly load in the info if we have not yet
+        if (activeUserId == "") then
+            -- Update to what card data is
+            local diskFile = fs.open("disk/hadesuser.txt", "r")
+            activeUserId = diskFile.read()
+            diskFile.close()
+
+            if (activeUserId == "") then
+                print("Error 8")
+                sleep(3)
+                return false
+            end
+
+           local data =  api.getUserInfo(configUrl, activeUserId)
+           if data.error then
+                print("Error 9")
+                sleep(3)
+                return false
+            end
+
+            activeUserName = data.Name
+        end
+
         print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
         print("1. Check Balance")
         print("9. Exit")
