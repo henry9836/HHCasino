@@ -61,39 +61,54 @@ function HideMessage(amountRequested, userId)
     return resultString
 end
 
-local userId = 1750222654637 -- Replace with actual userId
-local amount = 100 -- Replace with actual amount
-local message = HideMessage(amount, userId)
 
 local regData = {
     name = "AnEpicName"
 }
 
-local requestData = {
-    userId = userId,
-    amount = amount,
-    secret = message
-}
-
 local jsonReqText = textutils.serializeJSON(regData)
-local jsonText = textutils.serializeJSON(requestData)
 local headers = {
     ["Content-Type"] = "application/json"
 }
 
-print("Attempting to create new user")
+local TheUserId = ""
+
+print("Attempting to create new user...")
 local response = http.post(URL.."/register", jsonReqText, headers)
 if response then
     local status = response.getResponseCode()
     local body = response.readAll()
     print("Status:", status)
     print("Response:", body)
+
+    local data = json.unserialize(body)
+
     response.close()
+
+    if data.userId then
+        TheUserId = data.userId
+        print("our id is: ", TheUserId)
+    else
+        print("NO DATA")
+    end
 else
     print("Request failed.")
 end
 
-print("Attempting to add cash money")
+-- Attempt to add money
+
+local amount = 100 -- Replace with actual amount
+local message = HideMessage(amount, TheUserId)
+
+local requestData = {
+    userId = TheUserId,
+    amount = amount,
+    secret = message
+}
+
+local jsonText = textutils.serializeJSON(requestData)
+
+print("Attempting to add cash money...")
 response = http.post(URL.."/update", jsonText, headers)
 if response then
     local status = response.getResponseCode()
@@ -105,8 +120,8 @@ else
     print("Request failed.")
 end
 
-print("Checking our balance")
-response = http.get(URL.."/get-currency/"..userId)
+print("Checking our data...")
+response = http.get(URL.."/user/"..TheUserId)
 if response then
     local status = response.getResponseCode()
     local body = response.readAll()

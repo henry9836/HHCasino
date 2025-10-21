@@ -152,9 +152,9 @@ app.get('/', (req, res) => {
    res.json({ message: "The server glows with power. It sees you. 👀" });
 });
 
-// Get currency amount of user
-app.get('/get-currency/:id', async (req, res) => {
-    console.log("/get-currency/:id pinged");
+// Get data of user
+app.get('/user/:id', async (req, res) => {
+    console.log("/user/:id pinged");
     const userId = req.params.id;
     if (!userId || isNaN(userId)) {
         return res.status(400).json({error: "userId must be valid"});
@@ -166,12 +166,12 @@ app.get('/get-currency/:id', async (req, res) => {
     {
         conn = await pool.getConnection();
         const rows = await conn.query('SELECT * FROM users WHERE UserId = ? LIMIT 1', userId);
-        res.status(200).json(rows[0]);
     }
     catch (err) {
         res.status(500).json({error: `Failed to get user info: ${err.message}`});
     }
     finally {
+        res.status(200).json(rows[0]);
         if (conn) conn.release();
     }
 });
@@ -261,8 +261,8 @@ process.on('SIGINT', async () => {
     process.exit(0);
 });
 
-const Sec = HideMessage(12345, 3210789456);
-isValidSecret(Sec, 3210789456, 12345);
+/*const Sec = HideMessage(12345, 3210789456);
+isValidSecret(Sec, 3210789456, 12345);*/
 
 // Start server
 TestDatabaseConnection();
