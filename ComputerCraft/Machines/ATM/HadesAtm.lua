@@ -52,7 +52,7 @@ function showMenu()
         -- Quickly load in the info if we have not yet
         if (activeUserId == "") then
             -- Update to what card data is
-            local diskFile = fs.open("disk/hadesuser.txt", "r")
+            local diskFile = fs.open("disk/hadesuser", "r")
             activeUserId = diskFile.readAll()
             diskFile.close()
 
@@ -152,7 +152,7 @@ function RegisterNewUser()
     end
 
     -- Write UserId to disk
-    local diskFile = fs.open("disk/hadesuser.txt", "w")
+    local diskFile = fs.open("disk/hadesuser", "w")
     diskFile.write(tostring(userId))
     diskFile.close()
 
@@ -177,7 +177,7 @@ function handleMenuChoice(choice)
         -- Quickly load in the info if we have not yet
         if (activeUserId == "") then
             -- Update to what card data is
-            local diskFile = fs.open("disk/hadesuser.txt", "r")
+            local diskFile = fs.open("disk/hadesuser", "r")
             activeUserId = diskFile.read()
             diskFile.close()
 
