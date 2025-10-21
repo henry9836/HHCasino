@@ -166,12 +166,12 @@ app.get('/user/:id', async (req, res) => {
     {
         conn = await pool.getConnection();
         const rows = await conn.query('SELECT * FROM users WHERE UserId = ? LIMIT 1', userId);
+        res.status(200).json(rows[0]);
     }
     catch (err) {
         res.status(500).json({error: `Failed to get user info: ${err.message}`});
     }
     finally {
-        res.status(200).json(rows[0]);
         if (conn) conn.release();
     }
 });
