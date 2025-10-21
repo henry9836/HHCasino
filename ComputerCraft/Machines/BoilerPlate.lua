@@ -65,19 +65,24 @@ local userId = 1750222654637 -- Replace with actual userId
 local amount = 100 -- Replace with actual amount
 local message = HideMessage(amount, userId)
 
+local regData = {
+    name = "AnEpicName"
+}
+
 local requestData = {
     userId = userId,
     amount = amount,
     secret = message
 }
 
+local jsonReqText = textutils.serializeJSON(regData)
 local jsonText = textutils.serializeJSON(requestData)
 local headers = {
     ["Content-Type"] = "application/json"
 }
 
 print("Attempting to create new user")
-local response = http.get(URL.."/register")
+local response = http.post(URL.."/register", jsonReqText, headers)
 if response then
     local status = response.getResponseCode()
     local body = response.readAll()

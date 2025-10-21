@@ -177,10 +177,15 @@ app.get('/get-currency/:id', async (req, res) => {
 });
 
 //Register new user
-app.get('/register', async (req, res) => {
+app.post('/register', async (req, res) => {
     const NewUserId = generateUserId();
 
     console.log("/register pinged");
+
+    const { name } = req.body;
+    if (name === undefined) {
+        return res.status(401).json({error: "name must be valid"});
+    }
 
     // Add new user to db
     let conn;
@@ -188,12 +193,12 @@ app.get('/register', async (req, res) => {
     {
         // TODO: Implement name :3
         conn = await pool.getConnection();
-        await conn.query('INSERT INTO users (UserId) VALUES (?)', [NewUserId]);
+        await conn.query('INSERT INTO users (UserId, Name) VALUES (?, ?)', [NewUserId, name]);
         console.log(`Created new user: ${NewUserId}!`)
-        res.status(200).json({userId: NewUserId});
     }catch(err){
         res.status(500).json({error: `Failed to register new user: ${err.message}`});
     }finally{
+        res.status(200).json({userId: NewUserId});
         if (conn) await conn.release();
     }
 });
