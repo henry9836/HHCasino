@@ -53,7 +53,7 @@ function showMenu()
         if (activeUserId == "") then
             -- Update to what card data is
             local diskFile = fs.open("disk/hadesuser.txt", "r")
-            activeUserId = diskFile.read()
+            activeUserId = diskFile.readAll()
             diskFile.close()
 
             if (activeUserId == "") then
@@ -153,7 +153,7 @@ function RegisterNewUser()
 
     -- Write UserId to disk
     local diskFile = fs.open("disk/hadesuser.txt", "w")
-    diskFile.write(userId)
+    diskFile.write(tostring(userId))
     diskFile.close()
 
     -- Update the local vars
