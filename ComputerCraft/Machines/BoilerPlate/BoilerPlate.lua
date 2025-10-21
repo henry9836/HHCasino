@@ -21,6 +21,7 @@ if data.error then
     print("DATA INVALID!")
     return
 end
+print(data)
 
 local message = crypto.hideMessage(250, userId, configSecret)
 if api.updateMoney(configUrl, userId, 250, message) then
@@ -28,3 +29,11 @@ if api.updateMoney(configUrl, userId, 250, message) then
 else
     print("I HAVE FAILED ><")
 end
+
+print("FINAL")
+local data = api.getUserInfo(configUrl, userId)
+if data.error then
+    print("DATA INVALID!")
+    return
+end
+print(data)
