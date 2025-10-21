@@ -81,7 +81,7 @@ if response then
     print("Status:", status)
     print("Response:", body)
 
-    local data = json.unserialize(body)
+    local data = textutils.unserializeJSON(body)
 
     response.close()
 
