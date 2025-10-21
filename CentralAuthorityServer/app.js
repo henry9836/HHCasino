@@ -154,6 +154,7 @@ app.get('/', (req, res) => {
 
 // Get currency amount of user
 app.get('/get-currency/:id', async (req, res) => {
+    console.log("/get-currency/:id pinged");
     const userId = req.params.id;
     if (!userId || isNaN(userId)) {
         return res.status(400).json({error: "userId must be valid"});
@@ -179,10 +180,13 @@ app.get('/get-currency/:id', async (req, res) => {
 app.get('/register', async (req, res) => {
     const NewUserId = generateUserId();
 
+    console.log("/register pinged");
+
     // Add new user to db
     let conn;
     try
     {
+        // TODO: Implement name :3
         conn = await pool.getConnection();
         await conn.query('INSERT INTO users (UserId) VALUES (?)', [NewUserId]);
         console.log(`Created new user: ${NewUserId}!`)
@@ -197,6 +201,7 @@ app.get('/register', async (req, res) => {
 // Set new currency amount diff
 app.post('/update', async (req, res) => {
     const { userId, amount, secret } = req.body;
+    console.log("/user pinged");
     if (!userId || isNaN(userId)) {
         return res.status(400).json({error: "userId must be valid"});
     }
@@ -217,9 +222,12 @@ app.post('/update', async (req, res) => {
     {
         conn = await pool.getConnection();
         const currentValueRows = await conn.query('SELECT Currency FROM users WHERE UserId = ? LIMIT 1', [userId]);
+        if (currentValueRows.length === 0) {
+            return res.status(401).json({error: `User ${userId} not found`});
+        }
         const currencyValue = Number(currentValueRows[0].Currency);
         if (isNaN(currencyValue)) {
-            return res.status(400).json({error: "currencyValue must be valid"});
+            return res.status(401).json({error: "currencyValue must be valid"});
         }
 
         const newCurrencyValue = currencyValue + amount;
