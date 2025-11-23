@@ -7,6 +7,10 @@ const path = require('path');
 // Load .env data
 require('dotenv').config();
 
+// Init Logging
+let logDir = path.resolve(__dirname, '../logs');
+fs.mkdirSync(logDir, { recursive: true });
+
 const app = express();
 const PORT = 3000;
 
@@ -42,6 +46,33 @@ async function TestDatabaseConnection() {
     } finally {
         if (conn) conn.release();
     }
+}
+
+function logAction(actionObject)
+{
+    if (actionObject === undefined || actionObject === null)
+    {
+        return;
+    }
+
+    const entry = JSON.stringify({ ...actionObject, timestamp: Date.now() }) + '\n';
+
+    // Get day in unix time
+    const now = new Date();
+    now.setHours(0,0,0,0); // Set time to midnight
+    const dayTs = Math.floor(now.getTime() / 1000);
+
+    // Get file
+    const logFile = path.join(logDir, `${dayTs}.jsonl`)
+    const fileInterface = fs.openSync(logFile, 'a');
+    try{
+        fs.writeSync(fileInterface, entry);
+        fs.fsyncSync(fileInterface); // ensure crash-safe flush
+    } finally {
+        fs.closeSync(fileInterface);
+    }
+
+    console.log(`logged: ${dayTs}:${actionObject}`);
 }
 
 function generateUserId(){
@@ -195,6 +226,7 @@ app.post('/register', async (req, res) => {
         // TODO: Implement name :3
         conn = await pool.getConnection();
         await conn.query('INSERT INTO users (UserId, Name) VALUES (?, ?)', [NewUserId, name]);
+        logAction({"message" : "NewUserRegistered", "userId" : NewUserId, "username" : name});
         console.log(`Created new user: ${NewUserId}!`)
     }catch(err){
         res.status(500).json({error: `Failed to register new user: ${err.message}`});
@@ -238,6 +270,8 @@ app.post('/update', async (req, res) => {
 
         const newCurrencyValue = currencyValue + amount;
         await conn.query('UPDATE users SET Currency = ? WHERE UserId = ? LIMIT 1', [newCurrencyValue, userId]);
+
+        logAction({"message" : "UserCurrencyUpdated", "userId" : userId, "currency" : newCurrencyValue});
         res.status(200).json({message: "Updated user info"});
     }
     catch (err){
@@ -268,6 +302,7 @@ isValidSecret(Sec, 3210789456, 12345);*/
 // Start server
 TestDatabaseConnection();
 app.listen(PORT, () => {
+    logAction({"general" : "Started new session"})
     console.log(`Server is running on port ${PORT}`);
 
     // Print BG3 Reference :3
