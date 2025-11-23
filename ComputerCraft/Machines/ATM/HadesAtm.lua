@@ -3,6 +3,9 @@ local api = require("lib.api")
 local crypto = require("lib.crypto")
 local config = require("lib.config")
 
+local meBridge = peripheral.find("meBridge")
+local meCache = {}
+
 -- Load Config Data
 local configUrl = config.getApiUrl();
 local configSecret = config.getSecret();
@@ -14,6 +17,10 @@ activeColors = 0
 bundledOutputSide = "back"
 lastInteractionTime = 0
 timeoutDelay = 10
+
+function UpdateMeCache()
+    meCache = meBridge.listItems();
+end
 
 function ToggleDoors(bShouldClose)
    if (bShouldClose == true) then
@@ -74,6 +81,7 @@ function showMenu()
 
         print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
         print("1. Check Balance")
+        print("2. Deposit Items")
         print("9. Exit")
     else
         print("1. Get new card")
@@ -208,10 +216,34 @@ function handleMenuChoice(choice)
             end
             print("=== Hade's Infernal Reserve Casino ATM ===")
             print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
-            write("Current Balance: Ħ" .. data.Currency)
+            write("Cerberus Coins: " .. data.Currency)
             print("")
             print("Press any key to return")
             os.pullEvent("key")
+            return true
+        elseif choice == "1" then
+            UpdateMeCache()
+            clearScreen()
+            write("Place all items you wish to deposit into the chest on the right")
+            write("Once the chest is empty, press any key to continue.")
+            print("")
+            write("!!! ====== WARNING ====== !!!")
+            write("DO NOT press any key until the chest is EMPTY.")
+            write("If you press any key before the chest is empty, items may NOT be deposited into your account!")
+            write("Once you have placed everything and the chest is empty, press any key to continue safely.")
+            write("!!! ====== WARNING ====== !!!")
+            print("")
+            os.pullEvent("Press any key when finished")
+            sleep(1)
+
+            -- TODO: THINGS
+            -- Calc new item counts
+            local newItemCache = meBridge.listItems();
+            for _, newItem in pairs(newItemCache) do
+                -- this should crash to remind me where to continue deving
+                meCache
+            end
+
             return true
         elseif choice == "9" then
             clearScreen()
@@ -254,6 +286,7 @@ function main()
         -- Reset values
         activeUserId = ""
         activeUserName = ""
+        UpdateMeCache()
 
         -- Initially open doors
         ToggleDoors(false)
