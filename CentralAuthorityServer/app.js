@@ -236,6 +236,15 @@ app.post('/register', async (req, res) => {
     }
 });
 
+app.post('/vault', async (req, res) => {
+    const { deposits, withdrawals } = req.body;
+    if (deposits === undefined || deposits === null || withdrawals === undefined || withdrawals === null) {
+        return res.status(401).json({error: "deposits and withdrawals must be valid arrays"});
+    }
+
+    logAction({"message": "VaultUpdate", "deposits": deposits, "withdrawals": withdrawals});
+});
+
 // Set new currency amount diff
 app.post('/update', async (req, res) => {
     const { userId, amount, secret } = req.body;
@@ -295,9 +304,6 @@ process.on('SIGINT', async () => {
     await pool.end();
     process.exit(0);
 });
-
-/*const Sec = HideMessage(12345, 3210789456);
-isValidSecret(Sec, 3210789456, 12345);*/
 
 // Start server
 TestDatabaseConnection();
