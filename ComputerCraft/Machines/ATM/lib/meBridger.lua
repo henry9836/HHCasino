@@ -14,9 +14,17 @@ function Bridge.dumpAllItemsToScreen()
     end
 end
 
-function Bridge.dumpAllItemsJSON()
+function Bridge.dumpAllItemsJson()
     local items = Bridge.dumpAllItems()
-    return textutils.serializeJSON(items)
+    local filteredData = {}
+
+    for _, item in pairs(items) do
+        table.insert(filteredData, {
+            name = item.name
+            amount = item.amount
+        })
+
+    return textutils.serializeJSON(filteredData)
 end
 
 return Bridge;
