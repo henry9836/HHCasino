@@ -255,7 +255,7 @@ app.post('/vault', async (req, res) => {
         vaultChunk: formattedItems
     });
 
-    return res.status(200).json({message: "Updated vault info"});
+    return res.status(200).json({message: "Updated vault info!"});
 });
 
 app.post('/atm', async (req, res) => {
