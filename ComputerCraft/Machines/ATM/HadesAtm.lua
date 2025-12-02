@@ -284,7 +284,7 @@ function handleMenuChoice(choice)
             write("!!! ====== WARNING ====== !!!\n")
             print("")
             print("Press enter to continue")
-            input(":")
+            read()
             sleep(1)
 
             -- Calc new item counts
@@ -293,9 +293,11 @@ function handleMenuChoice(choice)
                 print(item.name, item.difference)
             end
 
-            
-            os.pullEvent("Press any key when finished")
+            -- Log on backend
+            UpdateAPIVaultState()
 
+            print("Press enter to continue")
+            read()
             return true
         elseif choice == "9" then
             clearScreen()
