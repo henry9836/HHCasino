@@ -95,7 +95,7 @@ function Api.sendVaultStateUpdate(items, url)
         -- Is our chunk big enough or out of items
         if #chunk >= Api.vaultChunkSize or i == #items then
             local payload = textutils.serializeJSON({items = chunk})
-            local response = http.post(url, payload, Api.headers)
+            local response = http.post(url.."/vault", payload, Api.headers)
             
             if response then
                 print(".")
