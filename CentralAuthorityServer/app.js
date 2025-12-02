@@ -237,6 +237,28 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/vault', async (req, res) => {
+    const { items } = req.body;
+    // Validate input
+    if (!items || !Array.isArray(items)) {
+        return res.status(400).json({ error: "items must be a valid array" });
+    }
+
+    // Transform items if needed (here we just log name and count)
+    const formattedItems = items.map(i => ({
+        name: i.name,
+        amount: i.count
+    }));
+
+    // Invoke your logger
+    logAction({
+        message: "VaultSync",
+        vaultChunk: formattedItems
+    });
+
+    return res.status(200).json({message: "Updated vault info"});
+});
+
+app.post('/atm', async (req, res) => {
     const { deposits, withdrawals } = req.body;
     if (deposits === undefined || deposits === null || withdrawals === undefined || withdrawals === null) {
         return res.status(401).json({error: "deposits and withdrawals must be valid arrays"});
