@@ -18,9 +18,9 @@ bundledOutputSide = "back"
 lastInteractionTime = 0
 timeoutDelay = 10
 
-function UpdateMEState()
+function UpdateMeState()
     previousMeState = {}
-    for _, item in pairs(Bridge.dumpAllItems()) do
+    for _, item in pairs(bridge.dumpAllItems()) do
 	    table.insert(previousMeState, {name = item.name, amount = item.amount})
     end
 end
@@ -128,7 +128,7 @@ end
 function UpdateAPIVaultState()
     print("Please wait... Syncing...")
     local items = {}
-    for _, item in pairs(Bridge.dumpAllItems()) do
+    for _, item in pairs(bridge.dumpAllItems()) do
 	    table.insert(items, {name = item.name, amount = item.amount})
     end
 
@@ -197,7 +197,7 @@ function calculateDifferences()
     local diffTable = {}
     local currentMeState = {}
 
-    for _, item in pairs(Bridge.dumpAllItems()) do
+    for _, item in pairs(bridge.dumpAllItems()) do
         table.insert(currentMeState, {name = item.name, amount = item.amount})
     end
 
@@ -271,19 +271,20 @@ function handleMenuChoice(choice)
             print("Press any key to return")
             os.pullEvent("key")
             return true
-        elseif choice == "1" then
+        elseif choice == "2" then
             UpdateMeState()
             clearScreen()
-            write("Place all items you wish to deposit into the chest on the right")
-            write("Once the chest is empty, press any key to continue.")
+            write("Place all items you wish to deposit into the chest on the right\n")
+            write("Once the chest is empty, press any key to continue.\n")
             print("")
-            write("!!! ====== WARNING ====== !!!")
-            write("DO NOT press any key until the chest is EMPTY.")
-            write("If you press any key before the chest is empty, items may NOT be deposited into your account!")
-            write("Once you have placed everything and the chest is empty, press any key to continue safely.")
-            write("!!! ====== WARNING ====== !!!")
+            write("!!! ====== WARNING ====== !!!\n")
+            write("DO NOT press any key until the chest is EMPTY.\n")
+            write("If you press any key before the chest is empty, items may NOT be deposited into your account!\n")
+            write("Once you have placed everything and the chest is empty, press any key to continue safely.\n")
+            write("!!! ====== WARNING ====== !!!\n")
             print("")
-            os.pullEvent("Press any key when finished")
+            print("Press enter to continue")
+            input(":")
             sleep(1)
 
             -- Calc new item counts

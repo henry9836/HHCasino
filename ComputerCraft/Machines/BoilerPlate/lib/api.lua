@@ -90,21 +90,22 @@ end
 function Api.sendVaultStateUpdate(items, url)
     local chunk = {}
     for i, item in ipairs(items) do
-	table.insert(chunk, item)
-	
-	-- Is our chunk big enough or out of items
-	if #chunk >= Api.vaultChunkSize or i == #items then
-        local payload = textutils.serializeJSON({items = chunk})
-        local response = http.post(url, payload, Api.headers)
+        table.insert(chunk, item)
         
-        if response then
-            print(".")
-            response.close()
-        else
-            print("!")
-        end
+        -- Is our chunk big enough or out of items
+        if #chunk >= Api.vaultChunkSize or i == #items then
+            local payload = textutils.serializeJSON({items = chunk})
+            local response = http.post(url, payload, Api.headers)
+            
+            if response then
+                print(".")
+                response.close()
+            else
+                print("!")
+            end
 
-        chunk = {}
+            chunk = {}
+        end
     end
 end
 
