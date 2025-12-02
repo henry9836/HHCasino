@@ -381,46 +381,7 @@ function main()
         
         -- Brief pause before going back to waiting state
         sleep(1)
-    endlocal API = {}
-
-local http = require("http") -- Make sure HTTP is enabled
-
--- Send inventory chunks to your server
--- items: array of {name, count}
--- serverUrl: endpoint URL
--- chunkSize: optional, default 100
-function API.sendInventoryChunks(items, serverUrl, chunkSize)
-    chunkSize = chunkSize or 100
-    if not items or type(items) ~= "table" then
-        error("Invalid items array")
     end
-    if not serverUrl or type(serverUrl) ~= "string" then
-        error("Invalid server URL")
-    end
-
-    local chunk = {}
-    for i, item in ipairs(items) do
-        table.insert(chunk, item)
-
-        -- Send when chunk is full or last item
-        if #chunk >= chunkSize or i == #items then
-            local payload = textutils.serializeJSON({ items = chunk })
-            local res = http.post(serverUrl, payload, { ["Content-Type"] = "application/json" })
-
-            if res then
-                print("Sent chunk:", i - #chunk + 1, "to", i)
-                res.close()
-            else
-                print("Failed to send chunk:", i - #chunk + 1, "to", i)
-            end
-
-            chunk = {} -- reset for next chunk
-        end
-    end
-end
-
-return API
-
 end
 
 -- Start the program
