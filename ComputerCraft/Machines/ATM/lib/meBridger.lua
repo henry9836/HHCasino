@@ -14,4 +14,9 @@ function Bridge.dumpAllItemsToScreen()
     end
 end
 
+function Bridge.dumpAllItemsJSON()
+    local items = Bridge.dumpAllItems()
+    return textutils.serializeJSON(items)
+end
+
 return Bridge;
