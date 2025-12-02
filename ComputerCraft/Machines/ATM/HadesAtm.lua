@@ -2,6 +2,7 @@
 local api = require("lib.api")
 local crypto = require("lib.crypto")
 local config = require("lib.config")
+local meBridge = require("lib.meBridger")
 
 local meBridge = peripheral.find("meBridge")
 local meCache = {}
