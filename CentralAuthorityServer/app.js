@@ -237,7 +237,9 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/vault', async (req, res) => {
+    console.log("/vault");
     const { items } = req.body;
+    console.log(items);
     // Validate input
     if (!items || !Array.isArray(items)) {
         return res.status(400).json({ error: "items must be a valid array" });
