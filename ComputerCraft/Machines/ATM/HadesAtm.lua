@@ -226,7 +226,6 @@ function calculateDifferences()
     return diffTable
 end
 
-
 function handleMenuChoice(choice)
     updateInteractionTime()
 
@@ -301,9 +300,10 @@ function handleMenuChoice(choice)
             UpdateAPIVaultState()
 
             -- TODO: Make despoit smarter
-            local message = crypto.hideMessage(totalAdd, userId, configSecret)
-            if api.updateMoney(configUrl, userId, totalAdd, message) then
+            local message = crypto.hideMessage(totalAdd, activeUserId, configSecret)
+            if api.updateMoney(configUrl, activeUserId, totalAdd, message) then
                 print("Successfull updated value :3")
+            end
 
             print("Press enter to continue")
             read()

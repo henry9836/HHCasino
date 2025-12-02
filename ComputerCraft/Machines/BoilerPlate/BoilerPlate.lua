@@ -15,7 +15,7 @@ if userId == "" then
     print("NO USER ID FOUND!!!")
     return
 end
-
+`
 local data = api.getUserInfo(configUrl, userId)
 if data.error then
     print("DATA INVALID!")

@@ -13,7 +13,7 @@ function Crypto.hideMessage(amountRequested, userId, key)
     local userIdLen = #userIdStr
     local count = 1 -- Lua is 1-based index
 
-    print(secret)
+   -- print(secret)
     for i = 1, #secret do
         local element = string.byte(secret, i)
         local keyElement = string.byte(userIdStr, count)
@@ -25,7 +25,7 @@ function Crypto.hideMessage(amountRequested, userId, key)
             count = 1
         end
     end
-    print(encryptedSecret)
+    --print(encryptedSecret)
 
     -- Step 2: Junk data generation
     local resultString = ""
@@ -52,7 +52,7 @@ function Crypto.hideMessage(amountRequested, userId, key)
 
     -- Step 3: Wrap it all up
     resultString = "$" .. tostring(junkUserIndex - 1) .. ":" .. resultString
-    print(resultString)
+    --print(resultString)
     return resultString
 end
 
