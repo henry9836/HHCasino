@@ -223,7 +223,6 @@ app.post('/register', async (req, res) => {
     let conn;
     try
     {
-        // TODO: Implement name :3
         conn = await pool.getConnection();
         await conn.query('INSERT INTO users (UserId, Name) VALUES (?, ?)', [NewUserId, name]);
         logAction({"message" : "NewUserRegistered", "userId" : NewUserId, "username" : name});

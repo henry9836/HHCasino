@@ -89,6 +89,7 @@ end
 
 function Api.sendVaultStateUpdate(items, url)
     local chunk = {}
+    print("")
     for i, item in ipairs(items) do
         table.insert(chunk, item)
         
@@ -98,10 +99,10 @@ function Api.sendVaultStateUpdate(items, url)
             local response = http.post(url.."/vault", payload, Api.headers)
             
             if response then
-                print(".")
+                write(".")
                 response.close()
             else
-                print("!")
+                write("!")
             end
 
             chunk = {}

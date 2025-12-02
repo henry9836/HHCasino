@@ -291,12 +291,19 @@ function handleMenuChoice(choice)
             print("Logging Difference:")
             -- Calc new item counts
             local diff = calculateDifferences()
+            local totalAdd = 0
             for _, item in pairs(diff) do
                 print(item.name, item.difference)
+                totalAdd = totalAdd + item.difference
             end
 
             -- Log on backend
             UpdateAPIVaultState()
+
+            -- TODO: Make despoit smarter
+            local message = crypto.hideMessage(totalAdd, userId, configSecret)
+            if api.updateMoney(configUrl, userId, totalAdd, message) then
+                print("Successfull updated value :3")
 
             print("Press enter to continue")
             read()
