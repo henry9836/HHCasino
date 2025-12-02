@@ -246,7 +246,7 @@ app.post('/vault', async (req, res) => {
     // Transform items if needed (here we just log name and count)
     const formattedItems = items.map(i => ({
         name: i.name,
-        amount: i.count
+        amount: i.amount
     }));
 
     // Invoke your logger
