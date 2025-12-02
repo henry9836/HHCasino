@@ -2,10 +2,7 @@
 local api = require("lib.api")
 local crypto = require("lib.crypto")
 local config = require("lib.config")
-local meBridge = require("lib.meBridger")
-
-local meBridge = peripheral.find("meBridge")
-local meCache = {}
+local bridge = require("lib.meBridger")
 
 -- Load Config Data
 local configUrl = config.getApiUrl();
@@ -14,13 +11,18 @@ local configSecret = config.getSecret();
 local activeUserId = ""
 local activeUserName = ""
 
+local previousMeState = {}
+
 activeColors = 0
 bundledOutputSide = "back"
 lastInteractionTime = 0
 timeoutDelay = 10
 
-function UpdateMeCache()
-    meCache = meBridge.listItems();
+function UpdateMEState()
+    previousMeState = {}
+    for _, item in pairs(Bridge.dumpAllItems()) do
+	    table.insert(previousMeState, {name = item.name, amount = item.amount})
+    end
 end
 
 function ToggleDoors(bShouldClose)
@@ -123,6 +125,18 @@ function waitForInteraction()
     updateInteractionTime()
 end
 
+function UpdateAPIVaultState()
+    print("Please wait... Syncing...")
+    local items = {}
+    for _, item in pairs(Bridge.dumpAllItems()) do
+	    table.insert(items, {name = item.name, amount = item.amount})
+    end
+
+    api.sendVaultStateUpdate(items, configUrl)
+    print("Done.")
+    sleep(1)
+end
+
 function RegisterNewUser()
     while true do -- Check for card and wait till user puts it in
         if isCardInserted() then
@@ -178,6 +192,41 @@ function RegisterNewUser()
     os.pullEvent("key")
 end
 
+function calculateDifferences()
+    local prevMap = {}
+    local diffTable = {}
+    local currentMeState = {}
+
+    for _, item in pairs(Bridge.dumpAllItems()) do
+        table.insert(currentMeState, {name = item.name, amount = item.amount})
+    end
+
+    -- Convert previousMeState into a map for fast lookup
+    for _, item in pairs(previousMeState) do
+        prevMap[item.name] = item.amount
+    end
+
+    -- Process currentMeState
+    for _, item in pairs(currentMeState) do
+        local prevAmount = prevMap[item.name] or 0
+        local diff = item.amount - prevAmount
+        if diff ~= 0 then
+            table.insert(diffTable, { name = item.name, difference = diff })
+        end
+
+        -- Remove from prevMap to track items that disappeared completely
+        prevMap[item.name] = nil
+    end
+
+    -- Handle items that existed before but are now gone (withdrawn completely)
+    for name, prevAmount in pairs(prevMap) do
+        table.insert(diffTable, { name = name, difference = -prevAmount })
+    end
+
+    return diffTable
+end
+
+
 function handleMenuChoice(choice)
     updateInteractionTime()
 
@@ -223,7 +272,7 @@ function handleMenuChoice(choice)
             os.pullEvent("key")
             return true
         elseif choice == "1" then
-            UpdateMeCache()
+            UpdateMeState()
             clearScreen()
             write("Place all items you wish to deposit into the chest on the right")
             write("Once the chest is empty, press any key to continue.")
@@ -237,13 +286,14 @@ function handleMenuChoice(choice)
             os.pullEvent("Press any key when finished")
             sleep(1)
 
-            -- TODO: THINGS
             -- Calc new item counts
-            local newItemCache = meBridge.listItems();
-            for _, newItem in pairs(newItemCache) do
-                -- this should crash to remind me where to continue deving
-                meCache
+            local diff = calculateDifferences()
+            for _, item in pairs(diff) do
+                print(item.name, item.difference)
             end
+
+            
+            os.pullEvent("Press any key when finished")
 
             return true
         elseif choice == "9" then
@@ -287,7 +337,7 @@ function main()
         -- Reset values
         activeUserId = ""
         activeUserName = ""
-        UpdateMeCache()
+        UpdateMeState()
 
         -- Initially open doors
         ToggleDoors(false)
@@ -331,7 +381,46 @@ function main()
         
         -- Brief pause before going back to waiting state
         sleep(1)
+    endlocal API = {}
+
+local http = require("http") -- Make sure HTTP is enabled
+
+-- Send inventory chunks to your server
+-- items: array of {name, count}
+-- serverUrl: endpoint URL
+-- chunkSize: optional, default 100
+function API.sendInventoryChunks(items, serverUrl, chunkSize)
+    chunkSize = chunkSize or 100
+    if not items or type(items) ~= "table" then
+        error("Invalid items array")
     end
+    if not serverUrl or type(serverUrl) ~= "string" then
+        error("Invalid server URL")
+    end
+
+    local chunk = {}
+    for i, item in ipairs(items) do
+        table.insert(chunk, item)
+
+        -- Send when chunk is full or last item
+        if #chunk >= chunkSize or i == #items then
+            local payload = textutils.serializeJSON({ items = chunk })
+            local res = http.post(serverUrl, payload, { ["Content-Type"] = "application/json" })
+
+            if res then
+                print("Sent chunk:", i - #chunk + 1, "to", i)
+                res.close()
+            else
+                print("Failed to send chunk:", i - #chunk + 1, "to", i)
+            end
+
+            chunk = {} -- reset for next chunk
+        end
+    end
+end
+
+return API
+
 end
 
 -- Start the program

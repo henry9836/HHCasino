@@ -20,9 +20,10 @@ function Bridge.dumpAllItemsJson()
 
     for _, item in pairs(items) do
         table.insert(filteredData, {
-            name = item.name
+            name = item.name,
             amount = item.amount
         })
+    end
 
     return textutils.serializeJSON(filteredData)
 end

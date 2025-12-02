@@ -3,6 +3,8 @@
 
 local Api = {}
 
+Api.vaultChunkSize = 100
+
 Api.headers = {
     ["Content-Type"] = "application/json"
 }
@@ -83,6 +85,27 @@ function Api.getUserInfo(url, userId)
         print("Request failed.")
     end
     return ""
+end
+
+function Api.sendVaultStateUpdate(items, url)
+    local chunk = {}
+    for i, item in ipairs(items) do
+	table.insert(chunk, item)
+	
+	-- Is our chunk big enough or out of items
+	if #chunk >= Api.vaultChunkSize or i == #items then
+        local payload = textutils.serializeJSON({items = chunk})
+        local response = http.post(url, payload, Api.headers)
+        
+        if response then
+            print(".")
+            response.close()
+        else
+            print("!")
+        end
+
+        chunk = {}
+    end
 end
 
 return Api
