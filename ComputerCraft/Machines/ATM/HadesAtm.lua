@@ -13,6 +13,24 @@ local activeUserName = ""
 
 local previousMeState = {}
 
+local basePrices = {
+    -- Base Minecraft Items
+    ["minecraft:cobblestone"] = 0.05,
+    ["minecraft:iron_ingot"]  = 5,
+    ["minecraft:diamond"]     = 50,
+    ["minecraft:dirt"]        = 0.01,
+    -- AE2
+    ["appliedenergistics2:fluix_crystal"] = 15,
+}
+
+local bonusPrices = {
+    ["minecraft:netherite_ingot"] = 1000,
+    ["appliedenergistics2:quantum_entangled_singularity"] = 5000
+}
+
+local fallbackPrice = 0.01
+local eConstant = math.exp(1)
+
 activeColors = 0
 bundledOutputSide = "back"
 lastInteractionTime = 0
@@ -192,6 +210,42 @@ function RegisterNewUser()
     os.pullEvent("key")
 end
 
+local function getScaledValue(basePrice, amount)
+    if amount <= 0 then
+        return 0
+    end
+    
+    -- Floor(BasePrice * log(Amount + e - 1))
+    local scaledValue = basePrice * (math.log(amount + E_CONSTANT - 1))
+
+    return math.floor(scaledValue)
+end
+
+function calculateIncome(vaultChange)
+    local totalIncome = 0
+
+    -- positive for deposit, negative for withdrawal
+    for itemName, deltaAmount in pairs(vaultChange) do
+        local absoluteAmount = math.abs(deltaAmount)
+        local basePrice = basePrices[itemName] or fallbackPrice
+
+        local scaledValue = getScaledValue(basePrice, absoluteAmount)
+        
+        -- Apply Whitelist Bonus
+        local bonus = bonusPrices[itemName] or 0
+        local finalValue = scaledValue + bonus
+        
+        -- For withdrawals, turn the positive value into a negative income
+        if not deltaAmount < 0 then
+            finalValue = finalValue * -1
+        end
+
+        totalIncome = totalIncome + finalValue
+    end
+
+    return totalIncome
+end
+
 function calculateDifferences()
     local prevMap = {}
     local diffTable = {}
@@ -297,12 +351,15 @@ function handleMenuChoice(choice)
             end
 
             -- Log on backend
+            totalAdd = calculateIncome(diff)
             UpdateAPIVaultState()
 
             -- TODO: Make despoit smarter
             local message = crypto.hideMessage(totalAdd, activeUserId, configSecret)
             if api.updateMoney(configUrl, activeUserId, totalAdd, message) then
-                print("Successfull updated value :3")
+                print("Successfully Deposited: " .. totalAdd .. " Cerberus Coins")
+            else then
+                print("Deposit Failed: Take a screenshot and send to admin: [DF" .. totalAdd .. "xBETOERR]")
             end
 
             print("Press enter to continue")
@@ -327,7 +384,7 @@ function handleMenuChoice(choice)
             clearScreen()
             print("Insert card on the left and then press any key to continue...")
             os.pullEvent("key")
-            return true
+            return truer
         elseif choice == "9" then
             print("Exiting...")
             ToggleDoors(false) -- Open doors when exiting
@@ -349,13 +406,13 @@ function main()
         -- Reset values
         activeUserId = ""
         activeUserName = ""
-        UpdateMeState()
 
         -- Initially open doors
         ToggleDoors(false)
 
         -- Wait for user interaction
         waitForInteraction()
+        UpdateMeState()
 
         -- Close the doors
         ToggleDoors(true)
