@@ -360,7 +360,7 @@ function handleMenuChoice(choice)
             local message = crypto.hideMessage(totalAdd, activeUserId, configSecret)
             if api.updateMoney(configUrl, activeUserId, totalAdd, message) then
                 print("Successfully Deposited: " .. totalAdd .. " Cerberus Coins")
-            else then
+            else
                 print("Deposit Failed: Take a screenshot and send to admin: [DF" .. totalAdd .. "xBETOERR]")
             end
 
