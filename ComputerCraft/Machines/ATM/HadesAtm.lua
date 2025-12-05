@@ -234,6 +234,8 @@ function calculateIncome(vaultChange)
         -- Apply Whitelist Bonus
         local bonus = bonusPrices[itemName] or 0
         local finalValue = scaledValue + bonus
+
+        print(itemName .. ": " .. finalValue)
         
         -- For withdrawals, turn the positive value into a negative income
         if not deltaAmount < 0 then
