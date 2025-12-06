@@ -28,7 +28,7 @@ local bonusPrices = {
     ["appliedenergistics2:quantum_entangled_singularity"] = 5000
 }
 
-local fallbackPrice = 1
+local fallbackPrice = 1000
 local eConstant = math.exp(1)
 
 activeColors = 0
@@ -230,6 +230,7 @@ function calculateIncome(vaultChange)
         local deltaAmount = itemData.difference
         local itemBasePrice = basePrices[itemName] or fallbackPrice
         local itemBonusPrice = bonusPrices[itemName] or 0
+        local currentAmount = previousMeState[itemName] or 0
 
         -- Get current price of current amount
         local currentPrice = getScaledValue(itemBasePrice, deltaAmount, itemBonusPrice)
