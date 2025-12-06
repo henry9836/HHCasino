@@ -241,7 +241,8 @@ function calculateIncome(vaultChange)
         print(itemName .. ": " .. finalValue)
         
         -- For withdrawals, turn the positive value into a negative income
-        if not deltaAmount < 0 then
+        local bIsDespoit = deltaAmount > 0
+        if not bIsDespoit then
             finalValue = finalValue * -1
         end
 

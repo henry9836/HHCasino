@@ -21,8 +21,8 @@ function Api.register(url, inName)
     if response then
         local status = response.getResponseCode()
         local body = response.readAll()
-        print("Status:", status)
-        print("Response:", body)
+        --print("Status:", status)
+        --print("Response:", body)
 
         local data = textutils.unserializeJSON(body)
 
@@ -42,7 +42,7 @@ function Api.register(url, inName)
 end
 
 function Api.updateMoney(url, inUserId, inAmount, message)
-    print("Attempting to add cash money...")
+    --print("Attempting to add cash money...")
     local requestData = {
         userId = inUserId,
         amount = inAmount,
@@ -54,8 +54,8 @@ function Api.updateMoney(url, inUserId, inAmount, message)
     if response then
         local status = response.getResponseCode()
         local body = response.readAll()
-        print("Status:", status)
-        print("Response:", body)
+        --print("Status:", status)
+        --print("Response:", body)
         response.close()
 
         return true
@@ -71,8 +71,8 @@ function Api.getUserInfo(url, userId)
     if response then
         local status = response.getResponseCode()
         local body = response.readAll()
-        print("Status:", status)
-        print("Response:", body)
+        --print("Status:", status)
+        --print("Response:", body)
         local data = textutils.unserializeJSON(body)
         response.close()
 
