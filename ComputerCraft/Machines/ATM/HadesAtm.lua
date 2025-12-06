@@ -225,7 +225,10 @@ function calculateIncome(vaultChange)
     local totalIncome = 0
 
     -- positive for deposit, negative for withdrawal
-    for itemName, deltaAmount in pairs(vaultChange) do
+    for _, itemData in pairs(vaultChange) do
+        local itemName = itemData.name
+        local deltaAmount = itemData.difference
+        
         local absoluteAmount = math.abs(deltaAmount)
         local basePrice = basePrices[itemName] or fallbackPrice
 
