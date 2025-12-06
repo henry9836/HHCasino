@@ -369,7 +369,9 @@ function handleMenuChoice(choice)
 
             print("Press enter to continue")
             read()
+            
             UpdateMeState()
+            UpdateAPIVaultState()
             updateInteractionTime()
             return true
         elseif choice == "9" then
