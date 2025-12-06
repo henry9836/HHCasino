@@ -28,4 +28,15 @@ function Bridge.dumpAllItemsJson()
     return textutils.serializeJSON(filteredData)
 end
 
+function Bridge.withdrawItem(itemName, amount)
+    local extractedCount, errorMessage = Bridge.meBridge.exportItem(diamondItem, "back")
+    if errorMessage then
+        print(errorMessage)
+        print("Please enter to continue")
+        read()
+        return false
+    end
+    return true
+end
+
 return Bridge;

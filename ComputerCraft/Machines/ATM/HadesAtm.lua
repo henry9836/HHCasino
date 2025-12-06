@@ -258,13 +258,55 @@ function searchStore(searchTerm)
 
     local firstItem = results[1]
     if firstItem then
-        print("First match:", firstItem.name)
+        write("How many " .. firstItem.name .. " to withdraw (max 64): ")
+        local amountToWithdraw = tonumber(read())
+
+        if (amountToWithdraw and amountToWithdraw > 1) then
+            local amountInSystem = previousMeState[firstItem.name].amount
+            
+            -- Clamp if out of bounds
+            amountToWithdraw = math.min(amountToWithdraw, 64, item.amount)
+
+            -- Get Cost
+            local itemName = item.name
+            local itemBasePrice = basePrices[itemName] or fallbackPrice
+            local itemBonusPrice = bonusPrices[itemName] or 0
+            local itemPrice = getScaledValue(itemBasePrice, item.amount, itemBonusPrice)
+            local totalCost = itemPrice * amountToWithdraw
+
+            -- Get User Info
+            local userData = api.getUserInfo(configUrl, activeUserId)
+            if userData.error then
+                print("Error 80")
+                sleep(3)
+                return false
+            end
+
+            if (userData.Currency < totalCost) then
+                print("You don't have enough to purchase this amount of " .. itemName .. ". You need " .. totalCost)
+                sleep(3)
+                return false
+            end
+
+            -- If can afford withdraw and inform api
+            local withdrawResult = bridge.withdrawItem(item.name, amountToWithdraw)
+            if withdrawResult then
+                -- Inform backend of purchase
+                local message = crypto.hideMessage(-totalCost, activeUserId, configSecret)
+                if api.updateMoney(configUrl, activeUserId, -totalCost, message) then
+                    print("Successfully Withdrew " .. amountToWithdraw .. " " .. itemName)
+                else
+                    print("Withdraw Failed: Take a screenshot and send to admin: [WD" .. totalCost .. "xBETOERR]")
+                end
+            end
+        end
+
+        print("Press enter to return to search")
+        read()
     else
         print("No matches found")
+        sleep(2)
     end
-
-    print("Press enter to return to search")
-    read()
 end
 
 function showStore()
