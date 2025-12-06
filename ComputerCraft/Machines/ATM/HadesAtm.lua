@@ -268,9 +268,11 @@ function showStore()
 
     -- Print output
     print("+-----------------------+")
-    print(string.format("%-20s %10s", "Name", "Cerberus Coins"))
+    --print(string.format("%-20s %10s", "Name", "Cerberus Coins"))
+    print(string.format("%-10s %-20s", "Cerberus Coins", "Name"))
     for i = 1, math.min(10, #items) do
-        print(string.format("%-20s %10d", items[i].name, items[i].price))
+        --print(string.format("%-20s %10d", items[i].name, items[i].price))
+        print(string.format("%-10d %-20s", items[i].price, items[i].name))
     end
     print("+-----------------------+")
 end
@@ -417,9 +419,6 @@ function handleMenuChoice(choice)
                     updateInteractionTime()
                 end
             end
-
-            print("Press enter to continue")
-            read()
 
             UpdateMeState()
             UpdateAPIVaultState()
