@@ -467,6 +467,7 @@ function handleMenuChoice(choice)
                     return false
                 end
                 clearScreen()
+                UpdateMeState()
                 print("=== Hade's Infernal Reserve Casino ATM ===")
                 print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
                 print("Cerberus Coins: " .. data.Currency)
