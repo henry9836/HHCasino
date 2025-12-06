@@ -310,6 +310,7 @@ function searchStore(searchTerm)
 end
 
 function showStore()
+    UpdateMeState()
     -- Copy list with prices included
     local items = {}
     for _, item in pairs(previousMeState) do
@@ -457,7 +458,6 @@ function handleMenuChoice(choice)
             return true
         elseif choice == "3" then
             clearScreen()
-            UpdateMeState()
 
             while true do
                 local data = api.getUserInfo(configUrl, activeUserId)
@@ -467,7 +467,6 @@ function handleMenuChoice(choice)
                     return false
                 end
                 clearScreen()
-                UpdateMeState()
                 print("=== Hade's Infernal Reserve Casino ATM ===")
                 print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
                 print("Cerberus Coins: " .. data.Currency)
