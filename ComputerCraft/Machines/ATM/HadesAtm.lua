@@ -367,7 +367,6 @@ function handleMenuChoice(choice)
             clearScreen()
             updateInteractionTime()
             return true
-        end
         elseif choice == "9" then
             clearScreen()
             print("Returning card...")
@@ -387,7 +386,7 @@ function handleMenuChoice(choice)
             clearScreen()
             print("Insert card on the left and then press any key to continue...")
             os.pullEvent("key")
-            return truer
+            return true
         elseif choice == "9" then
             print("Exiting...")
             ToggleDoors(false) -- Open doors when exiting
