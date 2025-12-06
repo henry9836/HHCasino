@@ -28,7 +28,7 @@ local bonusPrices = {
     ["appliedenergistics2:quantum_entangled_singularity"] = 5000
 }
 
-local fallbackPrice = 1000
+local fallbackPrice = 100
 local eConstant = math.exp(1)
 
 activeColors = 0
@@ -244,6 +244,35 @@ function calculateIncome(vaultChange)
     return totalIncome
 end
 
+function searchStore(searchTerm)
+    print("Searching for: " .. searchTerm)
+end
+
+function showStore()
+    print("+-----------------------+")
+    -- Copy list with prices included
+    local items = {}
+    for _, item in pairs(previousMeState) do
+        local itemBasePrice = basePrices[itemName] or fallbackPrice
+        local itemBonusPrice = bonusPrices[itemName] or 0
+        local itemPrice = getScaledValue(itemBasePrice, item.amount, itemBonusPrice)
+        table.insert(items{
+            name = item.name,
+            price = itemPrice
+        })
+    end
+
+    -- Sort by price
+    table.sort(items, function(a,b)
+        return a.price > b.price
+    end)
+
+    for i = 1, math.min(10, #items) do
+        print(items[i].name .. "  " .. items[i].price)
+    end
+    print("+-----------------------+")
+end
+
 function calculateDifferences()
     local prevMap = {}
     local diffTable = {}
@@ -363,13 +392,33 @@ function handleMenuChoice(choice)
             updateInteractionTime()
             return true
         elseif choice == "3" then
-            UpdateMeState()
             clearScreen()
             UpdateMeState()
 
+            while true do
+                local data = api.getUserInfo(configUrl, activeUserId)
+                if data.error then
+                    print("Error 30")
+                    sleep(3)
+                    return false
+                end
+                print("=== Hade's Infernal Reserve Casino ATM ===")
+                print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
+                print("Cerberus Coins: " .. data.Currency)
+                showStore()
+                print("Search for item (or type exit to return): ")
+                local searchTerm = read()
+                if searchTerm == "exit" then
+                    break
+                else 
+                    searchStore(searchTerm)
+                    updateInteractionTime()
+                end
+            end
+
             print("Press enter to continue")
             read()
-            
+
             UpdateMeState()
             UpdateAPIVaultState()
             updateInteractionTime()
