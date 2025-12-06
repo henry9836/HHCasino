@@ -289,7 +289,7 @@ function searchStore(searchTerm)
             end
 
             -- If can afford withdraw and inform api
-            local withdrawResult = bridge.withdrawItem(firstItem.name, amountToWithdraw)
+            local withdrawResult = bridge.withdrawItems(firstItem.name, amountToWithdraw)
             if withdrawResult then
                 -- Inform backend of purchase
                 local message = crypto.hideMessage(-totalCost, activeUserId, configSecret)
