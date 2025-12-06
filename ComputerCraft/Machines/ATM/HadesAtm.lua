@@ -262,16 +262,16 @@ function searchStore(searchTerm)
         local amountToWithdraw = tonumber(read())
 
         if (amountToWithdraw and amountToWithdraw > 1) then
-            local amountInSystem = previousMeState[firstItem.name].amount
+            local amountInSystem = firstItem.amount
             
             -- Clamp if out of bounds
-            amountToWithdraw = math.min(amountToWithdraw, 64, item.amount)
+            amountToWithdraw = math.min(amountToWithdraw, 64, firstItem.amount)
 
             -- Get Cost
-            local itemName = item.name
+            local itemName = firstItem.name
             local itemBasePrice = basePrices[itemName] or fallbackPrice
             local itemBonusPrice = bonusPrices[itemName] or 0
-            local itemPrice = getScaledValue(itemBasePrice, item.amount, itemBonusPrice)
+            local itemPrice = getScaledValue(itemBasePrice, firstItem.amount, itemBonusPrice)
             local totalCost = itemPrice * amountToWithdraw
 
             -- Get User Info
@@ -289,7 +289,7 @@ function searchStore(searchTerm)
             end
 
             -- If can afford withdraw and inform api
-            local withdrawResult = bridge.withdrawItem(item.name, amountToWithdraw)
+            local withdrawResult = bridge.withdrawItem(firstItem.name, amountToWithdraw)
             if withdrawResult then
                 -- Inform backend of purchase
                 local message = crypto.hideMessage(-totalCost, activeUserId, configSecret)
