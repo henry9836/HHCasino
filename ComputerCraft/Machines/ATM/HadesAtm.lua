@@ -217,7 +217,8 @@ local function getScaledValue(basePrice, amount, bonus)
     end
     
     -- Floor(BasePrice * log(Amount + e - 1))
-    local scaledValue = basePrice * (math.log(amount + eConstant - 1)) + bonus
+    --local scaledValue = basePrice * (math.log(amount + eConstant - 1)) + bonus
+    local scaledValue = basePrice / (math.log(amount + eConstant)) + bonus
 
     return math.floor(scaledValue)
 end
