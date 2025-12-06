@@ -245,18 +245,38 @@ function calculateIncome(vaultChange)
 end
 
 function searchStore(searchTerm)
+    searchTerm = searchTerm:lower()
     print("Searching for: " .. searchTerm)
+
+    local results = {}
+    for _, item in pairs(previousMeState) do
+        local itemName = item.name:lower()
+        if itemName:find(searchTerm) then
+            table.insert(results, item)
+        end
+    end
+
+    local firstItem = results[1]
+    if firstItem then
+        print("First match:", firstItem.name)
+    else
+        print("No matches found")
+    end
+
+    print("Press enter to return to search")
+    read()
 end
 
 function showStore()
     -- Copy list with prices included
     local items = {}
     for _, item in pairs(previousMeState) do
+        local itemName = item.name
         local itemBasePrice = basePrices[itemName] or fallbackPrice
         local itemBonusPrice = bonusPrices[itemName] or 0
         local itemPrice = getScaledValue(itemBasePrice, item.amount, itemBonusPrice)
         table.insert(items, {
-            name = item.name,
+            name = itemName,
             price = itemPrice
         })
     end
