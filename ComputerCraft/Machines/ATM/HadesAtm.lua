@@ -28,7 +28,7 @@ local bonusPrices = {
     ["appliedenergistics2:quantum_entangled_singularity"] = 5000
 }
 
-local fallbackPrice = 0.01
+local fallbackPrice = 1
 local eConstant = math.exp(1)
 
 activeColors = 0
@@ -102,7 +102,8 @@ function showMenu()
 
         print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
         print("1. Check Balance")
-        print("2. Deposit Items")
+        print("2. Deposit")
+        print("3. Withdraw")
         print("9. Exit")
     else
         print("1. Get new card")
@@ -174,14 +175,14 @@ function RegisterNewUser()
 
     local inputName = ""
     while inputName == "" do
-        write("Enter Desired Name: ")
+        print("Enter Desired Name: ")
         inputName = read()
     end
 
     clearScreen()
     print("=== Hade's Infernal Reserve Casino ATM ===")
     print("New User Card Registration")
-    write("Registering new user, please wait...");
+    print("Registering new user, please wait...");
 
     -- Register with API
     local userId = api.register(configUrl, inputName);
@@ -204,19 +205,19 @@ function RegisterNewUser()
     clearScreen()
     print("=== Hade's Infernal Reserve Casino ATM ===")
     print("")
-    write("Welcome to Hade's Infernal Reserve " .. activeUserName);
+    print("Welcome to Hade's Infernal Reserve " .. activeUserName);
     sleep(1)
     print("Press any key to continue...")
     os.pullEvent("key")
 end
 
-local function getScaledValue(basePrice, amount)
+local function getScaledValue(basePrice, amount, bonus)
     if amount <= 0 then
         return 0
     end
     
     -- Floor(BasePrice * log(Amount + e - 1))
-    local scaledValue = basePrice * (math.log(amount + eConstant - 1))
+    local scaledValue = basePrice * (math.log(amount + eConstant - 1)) + bonus
 
     return math.floor(scaledValue)
 end
@@ -224,29 +225,21 @@ end
 function calculateIncome(vaultChange)
     local totalIncome = 0
 
-    -- positive for deposit, negative for withdrawal
     for _, itemData in pairs(vaultChange) do
         local itemName = itemData.name
         local deltaAmount = itemData.difference
+        local itemBasePrice = basePrices[itemName] or fallbackPrice
+        local itemBonusPrice = bonusPrices[itemName] or 0
 
-        local absoluteAmount = math.abs(deltaAmount)
-        local basePrice = basePrices[itemName] or fallbackPrice
+        -- Get current price of current amount
+        local currentPrice = getScaledValue(itemBasePrice, deltaAmount, itemBonusPrice)
 
-        local scaledValue = getScaledValue(basePrice, absoluteAmount)
-        
-        -- Apply Whitelist Bonus
-        local bonus = bonusPrices[itemName] or 0
-        local finalValue = scaledValue + bonus
+        -- Multiply it by diff
+        local diffPrice = currentPrice * deltaAmount;
+        print(itemName .. ": " .. diffPrice)
 
-        print(itemName .. ": " .. finalValue)
-        
-        -- For withdrawals, turn the positive value into a negative income
-        local bIsDespoit = deltaAmount > 0
-        if not bIsDespoit then
-            finalValue = finalValue * -1
-        end
-
-        totalIncome = totalIncome + finalValue
+        -- Effect total
+        totalIncome = totalIncome + diffPrice
     end
 
     return totalIncome
@@ -325,22 +318,23 @@ function handleMenuChoice(choice)
             end
             print("=== Hade's Infernal Reserve Casino ATM ===")
             print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
-            write("Cerberus Coins: " .. data.Currency)
+            print("Cerberus Coins: " .. data.Currency)
             print("")
             print("Press any key to return")
             os.pullEvent("key")
+            updateInteractionTime()
             return true
         elseif choice == "2" then
             UpdateMeState()
             clearScreen()
-            write("Place all items you wish to deposit into the chest on the right\n")
-            write("Once the chest is empty, press enter to continue.\n")
+            print("Place all items you wish to deposit into the chest on the right\n")
+            print("Once the chest is empty, press enter to continue.\n")
             print("")
-            write("!!! ====== WARNING ====== !!!\n")
-            write("DO NOT press enter until the chest is EMPTY.\n")
-            write("If you press enter before the chest is empty, items may NOT be deposited into your account!\n")
-            write("Once you have placed everything and the chest is empty, press enter to continue safely.\n")
-            write("!!! ====== WARNING ====== !!!\n")
+            print("!!! ====== WARNING ====== !!!\n")
+            print("DO NOT press enter until the chest is EMPTY.\n")
+            print("If you press enter before the chest is empty, items may NOT be deposited into your account!\n")
+            print("Once you have placed everything and the chest is empty, press enter to continue safely.\n")
+            print("!!! ====== WARNING ====== !!!\n")
             print("")
             print("Press enter to continue when chest is empty")
             read()
@@ -348,29 +342,32 @@ function handleMenuChoice(choice)
 
             clearScreen()
             print("Logging Difference:")
+
             -- Calc new item counts
             local diff = calculateDifferences()
-            local totalAdd = 0
-            for _, item in pairs(diff) do
-                print(item.name, item.difference)
-                totalAdd = totalAdd + item.difference
-            end
 
             -- Log on backend
-            totalAdd = calculateIncome(diff)
+            calcIncome = calculateIncome(diff)
             UpdateAPIVaultState()
 
-            -- TODO: Make despoit smarter
-            local message = crypto.hideMessage(totalAdd, activeUserId, configSecret)
-            if api.updateMoney(configUrl, activeUserId, totalAdd, message) then
-                print("Successfully Deposited: " .. totalAdd .. " Cerberus Coins")
+            -- Inform backend
+            local message = crypto.hideMessage(calcIncome, activeUserId, configSecret)
+            if api.updateMoney(configUrl, activeUserId, calcIncome, message) then
+                print("Successfully Deposited: " .. calcIncome .. " Cerberus Coins")
             else
-                print("Deposit Failed: Take a screenshot and send to admin: [DF" .. totalAdd .. "xBETOERR]")
+                print("Deposit Failed: Take a screenshot and send to admin: [DF" .. calcIncome .. "xBETOERR]")
             end
 
             print("Press enter to continue")
             read()
+            updateInteractionTime()
             return true
+        elseif choice == "3" then
+            UpdateMeState()
+            clearScreen()
+            updateInteractionTime()
+            return true
+        end
         elseif choice == "9" then
             clearScreen()
             print("Returning card...")
@@ -433,7 +430,7 @@ function main()
             local startTime = os.clock()
             local input = nil
             
-            -- Create a timeout loop for input
+            -- Create a timeout loo p for input
             while true do
                 local timer = os.startTimer(0.1) -- Check every 0.1 seconds
                 local event, param = os.pullEvent()
