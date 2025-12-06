@@ -216,7 +216,7 @@ local function getScaledValue(basePrice, amount)
     end
     
     -- Floor(BasePrice * log(Amount + e - 1))
-    local scaledValue = basePrice * (math.log(amount + E_CONSTANT - 1))
+    local scaledValue = basePrice * (math.log(amount + eConstant - 1))
 
     return math.floor(scaledValue)
 end
@@ -228,7 +228,7 @@ function calculateIncome(vaultChange)
     for _, itemData in pairs(vaultChange) do
         local itemName = itemData.name
         local deltaAmount = itemData.difference
-        
+
         local absoluteAmount = math.abs(deltaAmount)
         local basePrice = basePrices[itemName] or fallbackPrice
 
