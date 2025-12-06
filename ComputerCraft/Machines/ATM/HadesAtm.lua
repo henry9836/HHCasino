@@ -236,7 +236,7 @@ function calculateIncome(vaultChange)
 
         -- Multiply it by diff
         local diffPrice = currentPrice * deltaAmount;
-        print(itemName .. ": " .. diffPrice)
+        print(itemName .. " @ " .. currentPrice .. " x" .. deltaAmount .. " : "  .. diffPrice)
 
         -- Effect total
         totalIncome = totalIncome + diffPrice
