@@ -268,10 +268,8 @@ function showStore()
 
     -- Print output
     print("+-----------------------+")
-    --print(string.format("%-20s %10s", "Name", "Cerberus Coins"))
-    print(string.format("%-10s %-20s", "Cerberus Coins", "Name"))
+    print(string.format("%-10s %-20s", "Cerberus", "Name"))
     for i = 1, math.min(10, #items) do
-        --print(string.format("%-20s %10d", items[i].name, items[i].price))
         print(string.format("%-10d %-20s", items[i].price, items[i].name))
     end
     print("+-----------------------+")
@@ -406,6 +404,7 @@ function handleMenuChoice(choice)
                     sleep(3)
                     return false
                 end
+                clearScreen()
                 print("=== Hade's Infernal Reserve Casino ATM ===")
                 print("User: " .. activeUserName .. " | Acc: " .. activeUserId)
                 print("Cerberus Coins: " .. data.Currency)
