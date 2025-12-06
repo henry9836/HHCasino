@@ -249,14 +249,13 @@ function searchStore(searchTerm)
 end
 
 function showStore()
-    print("+-----------------------+")
     -- Copy list with prices included
     local items = {}
     for _, item in pairs(previousMeState) do
         local itemBasePrice = basePrices[itemName] or fallbackPrice
         local itemBonusPrice = bonusPrices[itemName] or 0
         local itemPrice = getScaledValue(itemBasePrice, item.amount, itemBonusPrice)
-        table.insert(items{
+        table.insert(items, {
             name = item.name,
             price = itemPrice
         })
@@ -267,8 +266,11 @@ function showStore()
         return a.price > b.price
     end)
 
+    -- Print output
+    print("+-----------------------+")
+    print(string.format("%-20s %10s", "Name", "Cerberus Coins"))
     for i = 1, math.min(10, #items) do
-        print(items[i].name .. "  " .. items[i].price)
+        print(string.format("%-20s %10d", items[i].name, items[i].price))
     end
     print("+-----------------------+")
 end
