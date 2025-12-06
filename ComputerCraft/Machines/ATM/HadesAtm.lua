@@ -216,10 +216,7 @@ local function getScaledValue(basePrice, amount, bonus)
         return 0
     end
     
-    -- Floor(BasePrice * log(Amount + e - 1))
-    --local scaledValue = basePrice * (math.log(amount + eConstant - 1)) + bonus
     local scaledValue = basePrice / (math.log(amount + eConstant)) + bonus
-
     return math.floor(scaledValue)
 end
 
@@ -362,11 +359,17 @@ function handleMenuChoice(choice)
 
             print("Press enter to continue")
             read()
+            UpdateMeState()
             updateInteractionTime()
             return true
         elseif choice == "3" then
             UpdateMeState()
             clearScreen()
+            UpdateMeState()
+
+            print("Press enter to continue")
+            read()
+            UpdateMeState()
             updateInteractionTime()
             return true
         elseif choice == "9" then
@@ -416,7 +419,6 @@ function main()
 
         -- Wait for user interaction
         waitForInteraction()
-        UpdateMeState()
 
         -- Close the doors
         ToggleDoors(true)
