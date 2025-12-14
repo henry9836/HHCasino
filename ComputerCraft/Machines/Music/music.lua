@@ -1,42 +1,51 @@
+-- ffmpeg -i input.wav -ac 1 -ar <sampleRate> output.dfpwm
+-- mpv --audio-samplerate=22000 Hills.dfpwm
+
 local dfpwm = require("cc.audio.dfpwm")
 local speaker = peripheral.find("speaker")
 local decoder = dfpwm.make_decoder()
-local sampleRate = 48000
-
--- Speakers play at 48kHz, so 1.5 seconds is 72k samples. We first fill our buffer
--- with 0s, as there's nothing to echo at the start of the track!
-function play(filename)
-    local samples_i, samples_n = 1, sampleRate * 1.5
-    local samples = {}
-    for i = 1, samples_n do samples[i] = 0 end
-
-    local decoder = dfpwm.make_decoder()
-    for chunk in io.lines(filename, 16 * 1024) do
-        local buffer = decoder(chunk)
-
-        for i = 1, #buffer do
-            local original_value = buffer[i]
-
-            -- Replace this sample with its current amplitude plus the amplitude from 1.5 seconds ago.
-            -- We scale both to ensure the resulting value is still between -128 and 127.
-            buffer[i] = original_value * 0.6 + samples[samples_i] * 0.4
-
-            -- Now store the current sample, and move the "head" of our ring buffer forward one place.
-            samples[samples_i] = original_value
-            samples_i = samples_i + 1
-            if samples_i > samples_n then samples_i = 1 end
-        end
-
-        while not speaker.playAudio(buffer) do
-            os.pullEvent("speaker_audio_empty")
-        end
-
-        -- The audio processing above can be quite slow and preparing the first batch of audio
-        -- may timeout the computer. We sleep to avoid this.
-        -- There's definitely better ways of handling this - this is just an example!
-        sleep(0.05)
+local sampleRate = 22000
+ 
+-- Function to play a DFPWM file of any sample rate
+-- filename: string, path to the DFPWM file
+-- originalRate: number, sample rate the file was encoded at (e.g., 8000, 16000)
+local function play(filename, originalRate)
+    if not speaker then
+        error("No speaker found")
     end
+ 
+    local upsampleFactor = math.floor(48000 / originalRate + 0.5)
+    if upsampleFactor < 1 then upsampleFactor = 1 end
+ 
+    local decoder = dfpwm.make_decoder()
+    local h = fs.open(filename, "rb")
+    if not h then
+        error("File not found: " .. filename)
+    end
+ 
+    while true do
+        local chunk = h.read(1024)
+        if not chunk then break end
+        local decoded = decoder(chunk)  -- returns table of bytes
+ 
+        -- upsample by repeating each sample
+        local upsampled = {}
+        for i = 1, #decoded do
+            for j = 1, upsampleFactor do
+                upsampled[#upsampled + 1] = decoded[i]
+            end
+        end
+ 
+        speaker.playAudio(upsampled)
+        os.pullEvent("speaker_audio_empty")
+    end
+ 
+    h.close()
 end
+ 
+-- Example usage
+playDFPWM("music.dfpwm", 8000)   -- plays an 8 kHz file
+-- playDFPWM("voice.dfpwm", 16000) -- plays a 16 kHz file
 
 -- Open modem port and list
 local modem = peripheral.find("modem")
@@ -65,7 +74,7 @@ for i, file in ipairs(playlist) do
     term.clear()
     term.setCursorPos(1, 1)
     print("Currently Playing: " .. file)
-    play("/playlist/" .. file)
+    play("/playlist/" .. file, sampleRate)
 end
 
 -- If we get a modem comm then insert at next position of list
