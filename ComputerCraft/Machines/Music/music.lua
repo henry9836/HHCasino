@@ -42,10 +42,6 @@ local function play(filename, originalRate)
  
     h.close()
 end
- 
--- Example usage
-playDFPWM("music.dfpwm", 8000)   -- plays an 8 kHz file
--- playDFPWM("voice.dfpwm", 16000) -- plays a 16 kHz file
 
 -- Open modem port and list
 local modem = peripheral.find("modem")
