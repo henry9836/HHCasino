@@ -96,7 +96,8 @@ for i, file in ipairs(playlist) do
         webpath = result.path
 
         -- wget url /playlist/filename.dfpwm
-        shell.run("wget", webpath .. " " .. "/playlist/" .. file .. ".dfpwm")
+        print("Downloading from CDN...")
+        shell.run("wget", configUrl .. "/" .. webpath .. " " .. "/playlist/" .. file .. ".dfpwm")
 
         print("Currently Playing: " .. file)
         play("/playlist/" .. file .. ".dfpwm", sampleRate)
