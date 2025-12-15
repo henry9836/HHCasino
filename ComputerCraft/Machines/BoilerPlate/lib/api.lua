@@ -110,4 +110,30 @@ function Api.sendVaultStateUpdate(items, url)
     end
 end
 
+function Api.searchMusicFile(filename, url)
+    local response = http.get(url.."/search/"..filename)
+    if response then
+        local status = response.getResponseCode()
+        local body = response.readAll()
+        response.close()
+
+        if status ~= 200 then
+            return nil
+        end
+
+        -- data api
+        -- {
+        --   "path" = "music/32000/hills.dfpwm",
+        --   "sample-rate" = "32000"
+        -- }
+
+        local data = textutils.unserializeJSON(body)
+        return data
+    else
+        print("Search failed for " .. filename)
+    end
+
+    return nil
+end
+
 return Api

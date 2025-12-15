@@ -1,14 +1,11 @@
 -- ffmpeg -i input.wav -ac 1 -ar <sampleRate> output.dfpwm
 -- mpv --audio-samplerate=22000 Hills.dfpwm
-local api = require("lib.api")
-local config = require("lib.config")
+
 local dfpwm = require("cc.audio.dfpwm")
 local speaker = peripheral.find("speaker")
 local decoder = dfpwm.make_decoder()
-
-local configUrl = config.getApiUrl();
-local sampleRate = 48000
-
+local sampleRate = 22000
+ 
 -- Function to play a DFPWM file of any sample rate
 -- filename: string, path to the DFPWM file
 -- originalRate: number, sample rate the file was encoded at (e.g., 8000, 16000)
@@ -52,20 +49,8 @@ if modem then
     modem.open(666)
 end
 
--- Reads music list
-local playlistFile = fs.open("playlistFile", "r")
-local playlist = {}
-while true do
-    local line = file.readLine()
-    if not line then break end
-
-    line = line:match("^%s*(.-)%s*$") -- trim whitespace
-    if line ~= "" then
-        table.insert(list, line)
-    end
-end
-
 -- Randomises a music list
+local playlist = fs.list('/playlist')
 math.randomseed(os.epoch("utc"))
 for i = #playlist, 2, -1 do
     local j = math.random(i)
@@ -73,7 +58,7 @@ for i = #playlist, 2, -1 do
 end
 
 -- print result for now
-print("[ Playlist Queued ]")
+print ("[ Playlist Queued ]")
 for i, file in ipairs(playlist) do
     write(" - ")
     print(file)
@@ -82,30 +67,10 @@ end
 -- Plays through the music list
 local t, dt = 0, 2 * math.pi * 220 / 48000
 for i, file in ipairs(playlist) do
-    -- Get rid of the previous files
-    shell.run("rm", "/playlist/*.dfpwm")
-
     term.clear()
     term.setCursorPos(1, 1)
-    print("Retrieving: " .. file)
-
-    local result = api.searchMusicFile(file, configUrl)
-    if not result then
-        print("ERROR")
-        sleep(3)
-        goto continue
-    end
-
-    sampleRate = tonumber(result["sample-rate"])
-    webpath = result.path
-
-    -- wget url /playlist/filename.dfpwm
-    shell.run("wget", webpath .. " " .. "/playlist/" .. file .. ".dfpwm")
-
     print("Currently Playing: " .. file)
-    play("/playlist/" .. file .. ".dfpwm", sampleRate)
-
-    ::continue::
+    play("/playlist/" .. file, sampleRate)
 end
 
 -- If we get a modem comm then insert at next position of list
