@@ -56,7 +56,7 @@ end
 local playlistFile = fs.open("playlistFile", "r")
 local playlist = {}
 while true do
-    local line = file.readLine()
+    local line = playlistFile.readLine()
     if not line then break end
 
     line = line:match("^%s*(.-)%s*$") -- trim whitespace
