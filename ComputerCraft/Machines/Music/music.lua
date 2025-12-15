@@ -61,7 +61,7 @@ while true do
 
     line = line:match("^%s*(.-)%s*$") -- trim whitespace
     if line ~= "" then
-        table.insert(list, line)
+        table.insert(playlist, line)
     end
 end
 
