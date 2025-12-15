@@ -102,7 +102,6 @@ for i, file in ipairs(playlist) do
     else
         print("ERROR")
         sleep(3)
-        goto continue
     end
 end
 
