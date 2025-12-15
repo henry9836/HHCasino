@@ -14,6 +14,7 @@ fs.mkdirSync(logDir, { recursive: true });
 const app = express();
 const PORT = 3000;
 
+app.use(express.static('public'));
 app.use(express.json());
 
 const EnvSecret = process.env.CASINO_SECRET;
@@ -42,7 +43,7 @@ async function TestDatabaseConnection() {
     } catch (error) {
         console.error('Database connection failed:', error);
         if (conn) conn.release();
-        process.exit(1);
+        //process.exit(1);
     } finally {
         if (conn) conn.release();
     }
@@ -182,6 +183,32 @@ function HideMessage(AmountRequested, UserId)
 app.get('/', (req, res) => {
    res.json({ message: "The server glows with power. It sees you. 👀" });
 });
+
+app.get('/search/:musicId', (req, res) => {
+    // Search through all dirs for the file,
+    // once we find it return the public path for wget and the sample rate which is the sub folder
+    const files = fs.readdirSync("./public/music/", {recursive: true});
+    const searchTerm = req.params.musicId;
+
+    const result = files.filter(file => {
+        const afterSlash = file.split('/')[1]; // undefined if no '/'
+        if (afterSlash?.includes(searchTerm))
+        {
+            return file;
+        }
+    });
+
+    if (result !== undefined && result.length > 0)
+    {
+        const [sampleRate, filename] = result[0].split('/');
+        return res.status(200).json({
+            "path" : `music/${result[0]}`,
+            "sample-rate" : sampleRate
+        });
+    }
+
+    return res.status(401).json({error: `File not found`});
+})
 
 // Get data of user
 app.get('/user/:id', async (req, res) => {

@@ -1,0 +1,8 @@
+Keep all files under 1MB as that is the hard limit for computer craft
+Try to aim for under 950KB if possible
+
+Generating files:
+ffmpeg -i input.wav -ac 1 -ar <sampleRate> output.dfpwm
+
+Previewing Files:
+mpv --audio-samplerate=<sampleRate> output.dfpwm
