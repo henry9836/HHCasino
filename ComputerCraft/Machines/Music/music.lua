@@ -90,22 +90,20 @@ for i, file in ipairs(playlist) do
     print("Retrieving: " .. file)
 
     local result = api.searchMusicFile(file, configUrl)
-    if not result then
+    if result then
+        sampleRate = tonumber(result["sample-rate"])
+        webpath = result.path
+
+        -- wget url /playlist/filename.dfpwm
+        shell.run("wget", webpath .. " " .. "/playlist/" .. file .. ".dfpwm")
+
+        print("Currently Playing: " .. file)
+        play("/playlist/" .. file .. ".dfpwm", sampleRate)
+    else
         print("ERROR")
         sleep(3)
         goto continue
     end
-
-    sampleRate = tonumber(result["sample-rate"])
-    webpath = result.path
-
-    -- wget url /playlist/filename.dfpwm
-    shell.run("wget", webpath .. " " .. "/playlist/" .. file .. ".dfpwm")
-
-    print("Currently Playing: " .. file)
-    play("/playlist/" .. file .. ".dfpwm", sampleRate)
-
-    ::continue::
 end
 
 -- If we get a modem comm then insert at next position of list
