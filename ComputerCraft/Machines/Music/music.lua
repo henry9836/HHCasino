@@ -91,6 +91,7 @@ for i, file in ipairs(playlist) do
 
     local result = api.searchMusicFile(file, configUrl)
     if result then
+        print("Retrieved!")
         sampleRate = tonumber(result["sample-rate"])
         webpath = result.path
 
@@ -100,7 +101,7 @@ for i, file in ipairs(playlist) do
         print("Currently Playing: " .. file)
         play("/playlist/" .. file .. ".dfpwm", sampleRate)
     else
-        print("ERROR")
+        print("ERR no result")
         sleep(3)
     end
 end
