@@ -13,6 +13,9 @@
 -- Load Libs
 local api = require("lib.api")
 local config = require("lib.config")
+local dfpwm = require("cc.audio.dfpwm")
+local speaker = peripheral.find("speaker")
+local decoder = dfpwm.make_decoder()
 
 -- Load Config Data
 local configUrl = config.getApiUrl();
@@ -20,6 +23,7 @@ local configSecret = config.getSecret();
 
 local activeUserId = ""
 local activeUserName = ""
+local sampleRate = 48000
 
 -- Computer Monitor
 local monitor = peripheral.find("monitor")
@@ -51,6 +55,40 @@ local userCurrency = 0
 local totalBetted = 0
 local totalLost = 0
 local totalWin = 0
+
+local function play(filename, originalRate)
+    if not speaker then
+        error("No speaker found")
+    end
+ 
+    local upsampleFactor = math.floor(48000 / originalRate + 0.5)
+    if upsampleFactor < 1 then upsampleFactor = 1 end
+ 
+    local decoder = dfpwm.make_decoder()
+    local h = fs.open(filename, "rb")
+    if not h then
+        error("File not found: " .. filename)
+    end
+ 
+    while true do
+        local chunk = h.read(1024)
+        if not chunk then break end
+        local decoded = decoder(chunk)  -- returns table of bytes
+ 
+        -- upsample by repeating each sample
+        local upsampled = {}
+        for i = 1, #decoded do
+            for j = 1, upsampleFactor do
+                upsampled[#upsampled + 1] = decoded[i]
+            end
+        end
+ 
+        speaker.playAudio(upsampled)
+        os.pullEvent("speaker_audio_empty")
+    end
+ 
+    h.close()
+end
 
 function clearScreen()
     term.clear()
@@ -186,7 +224,7 @@ function flipCoin()
     local roll = math.random(101)
 
     clearScreen()
-    monitor.write("FLIPPING COIN...")
+    monitor.write("FLIPPING COIN...")Win: 🔥🎰 The Devil deals you 
     monitor.setCursorPos(1, 2)
     monitor.write("Bet: $" .. betPlaced)
     monitor.setCursorPos(1, 3)
@@ -194,12 +232,15 @@ function flipCoin()
 
     print("Flipping...")
 
+    play("/music/flip.dfpwm", 48000)
 
     clearScreen()
     if roll <= oddsToWin then
-        print("win")
+        print("The Devil deals you a hot hand, You win!")
+        play("/music/win.dfpwm", 48000)
     else
-        print("lose")
+        print("The Devil grins, the house wins")
+        play("/music/lose.dfpwm", 48000)
     end
 end
 
@@ -249,4 +290,37 @@ while true do
     gameLoop()
 
     sleep(0.1)
+end
+local function play(filename, originalRate)
+    if not speaker then
+        error("No speaker found")
+    end
+ 
+    local upsampleFactor = math.floor(48000 / originalRate + 0.5)
+    if upsampleFactor < 1 then upsampleFactor = 1 end
+ 
+    local decoder = dfpwm.make_decoder()
+    local h = fs.open(filename, "rb")
+    if not h then
+        error("File not found: " .. filename)
+    end
+ 
+    while true do
+        local chunk = h.read(1024)
+        if not chunk then break end
+        local decoded = decoder(chunk)  -- returns table of bytes
+ 
+        -- upsample by repeating each sample
+        local upsampled = {}
+        for i = 1, #decoded do
+            for j = 1, upsampleFactor do
+                upsampled[#upsampled + 1] = decoded[i]
+            end
+        end
+ 
+        speaker.playAudio(upsampled)
+        os.pullEvent("speaker_audio_empty")
+    end
+ 
+    h.close()
 end
