@@ -83,7 +83,7 @@ function resetGameState()
     currentLosingStreak = 0
     currentLosingStreakModifier = 0.0
     currentWiningStreakModifier = 0.0
-base
+
     pot = 0
     currentRound = 0
     betPlaced = 0
