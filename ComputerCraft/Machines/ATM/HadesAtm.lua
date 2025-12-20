@@ -385,10 +385,6 @@ end
 function handleMenuChoice(choice)
     updateInteractionTime()
 
-    if choice == configSecret then
-        os.pullEvent = originalPullEvent
-    end
-
     if isCardInserted() then -- Has Card
 
         -- Quickly load in the info if we have not yet
@@ -546,6 +542,13 @@ function main()
 
         -- Wait for user interaction
         waitForInteraction()
+
+        print("Press enter to continue")
+        local pass = read()
+        if pass == configSecret then
+            os.pullEvent = originalPullEvent
+        end
+
 
         -- Close the doors
         ToggleDoors(true)
