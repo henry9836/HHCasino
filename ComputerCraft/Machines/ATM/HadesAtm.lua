@@ -143,11 +143,6 @@ function waitForInteraction()
     print("")
     print("Insert Hade's Infernal Reserve Bank Card on the left if you are an existing customer")
     print("")
-    print("Press any key to begin!")
-    
-    -- Wait for any key press
-    os.pullEvent("key")
-    updateInteractionTime()
 end
 
 function UpdateAPIVaultState()
@@ -548,6 +543,8 @@ function main()
         if pass == configSecret then
             os.pullEvent = originalPullEvent
         end
+
+        updateInteractionTime()
 
 
         -- Close the doors
