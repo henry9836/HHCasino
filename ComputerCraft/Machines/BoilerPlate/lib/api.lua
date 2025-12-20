@@ -140,4 +140,45 @@ function Api.searchMusicFile(filename, url)
     return data
 end
 
+function Api.logAction(url, actionType, machine, userId, userName, actionValue)
+    if not url or not actionType or not machine or not userId or not userName or type(actionValue) ~= "table" then
+        print("Api.logAction: Missing or invalid parameters")
+        return false
+    end
+
+    -- Build the payload table
+    local payload = {
+        actionType = actionType,
+        machine = machine,
+        userId = userId,
+        username = userName,
+        value = actionValue
+    }
+
+    -- Serialize payload to JSON
+    local payloadJson = textutils.serializeJSON(payload)
+
+    -- Send POST request
+    local response = http.post(url.."/logaction", payloadJson, {
+        ["Content-Type"] = "application/json"
+    })
+
+    if not response then
+        print("Api.logAction: Failed to contact server")
+        return false
+    end
+
+    local status = response.getResponseCode()
+    local body = response.readAll()
+    response.close()
+
+    if status ~= 200 then
+        print("Api.logAction: Server returned status " .. status .. ", body: " .. body)
+        return false
+    end
+
+    return true
+end
+
+
 return Api
