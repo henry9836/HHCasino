@@ -10,9 +10,7 @@
 
 -- Load Libs
 local api = require("lib.api")
-local crypto = require("lib.crypto")
 local config = require("lib.config")
-local bridge = require("lib.meBridger")
 
 -- Load Config Data
 local configUrl = config.getApiUrl();
@@ -24,7 +22,7 @@ local activeUserName = ""
 -- Computer Monitor
 local monitor = peripheral.find("monitor")
 monitor.clear()
-monitor.setTextScale(3)
+monitor.setTextScale(2)
 monitor.setBackgroundColor(colors.black)
 monitor.setTextColor(colors.red)
 monitor.write("Devil's Toss is starting, please wait...")
@@ -51,9 +49,12 @@ end
 function waitForInteraction()
     clearScreen()
 
+    monitor.setTextScale(3)
     monitor.write("Devil's Toss")
+    monitor.setTextScale(1)
     monitor.setCursorPos(1, 2)
     monitor.write("Your next flip could double it all")
+    monitor.setTextScale(2)
 end
 
 function resetGameState()
