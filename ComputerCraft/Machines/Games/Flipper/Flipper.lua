@@ -68,6 +68,9 @@ function clearScreen()
     term.clear()
     monitor.clear()
 
+    monitor.setBackgroundColor(colors.black)
+    monitor.setTextColor(colors.red)
+
     term.setCursorPos(1, 1)
     monitor.setCursorPos(1, 1)
 end
@@ -219,7 +222,11 @@ function flipCoin()
     local roll = math.random(100 + offset)
 
     clearScreen()
-    monitor.write("FLIPPING COIN...")
+    if (currentRound >= 1) then
+        monitor.write("LETTING IT RIDE...")
+    else
+        monitor.write("FLIPPING COIN...")
+    end
     monitor.setCursorPos(1, 2)
     monitor.write("Bet: $" .. betPlaced)
     monitor.setCursorPos(1, 3)
@@ -240,12 +247,20 @@ function flipCoin()
         else
             play("/music/win.dfpwm", 48000)
         end
-        
+
         currentRound = currentRound + 1
+
+        monitor.clear()
+        monitor.setCursorPos(1, 1)
+        monitor.write(username)
+        monitor.setCursorPos(1, 2)
+        monitor.write("Won: " .. getWinAmount() .. "!")
+        flashMonitor()
+
     else -- LOSE
         print("The Devil grins, the house wins")
         play("/music/lose.dfpwm", 48000)
-        
+
         totalLost = totalLost + betPlaced
         totalBetted = totalBetted + betPlaced
 
@@ -257,9 +272,33 @@ function flipCoin()
         currentLosingStreak = currentLosingStreak + 1
         currentRound = 0
         betPlaced = 0
+
+        monitor.clear()
+        monitor.setCursorPos(1, 1)
+        monitor.write("The Devil grins")
+        monitor.setCursorPos(1, 2)
+        monitor.write("the house wins:")
+        monitor.setCursorPos(1, 3)
+        monitor.write(getWinAmount())
+        flashMonitor()
     end
 
     return false
+end
+
+function flashMonitor()
+    for i = 1, 3 do
+        -- Red text on black background
+        monitor.setBackgroundColor(colors.black)
+        monitor.setTextColor(colors.red)
+        
+        os.sleep(0.25)
+        
+        -- Black text on red background
+        monitor.setBackgroundColor(colors.red)
+        monitor.setTextColor(colors.black)
+        os.sleep(0.25)
+    end
 end
 
 function gameLoop()
