@@ -212,14 +212,14 @@ function getRigging()
      -- Cheat the odds
     local offset = 1
 
-    -- at 2.5x odds go down to 45%
-    if getMultiplier() > 2.5 then
-        offset = offset + 45
+    -- at 5x odds go down by 10% 
+    if getMultiplier() > 5 then
+        offset = offset + 10
     end
 
-    -- at 30x odds go to 30%
-    if getMultiplier() > 30 then
-        offset = offset + 30
+    -- at 15x odds go down by another 30%
+    if getMultiplier() > 15 then
+        offset = offset + 20
     end
     
     return offset
