@@ -171,22 +171,7 @@ function presentGameState()
 
         print("Cash out value: " .. getWinAmount() .. " Cerberus Coins")
         print("Let it ride for " .. getMultiplier() .. "x?")
-        print("[Y/n]? : ")
-        local choice = read()
-        if choice == "n" then
-            -- Inform backend
-            local message = crypto.hideMessage(getWinAmount(), activeUserId, configSecret)
-            api.updateMoney(configUrl, activeUserId, getWinAmount(), message)
-
-            -- Softer reset
-            totalWin = totalWin + getWinAmount()
-            totalBetted = totalBetted + betPlaced
-            currentRound = 0
-            currentLosingStreak = 0
-            betPlaced = 0
-            oddsToWin = originalOddsToWin
-            userCurrency = 0
-        end
+        write("[Y/n]? : ")
     end
 end
 
@@ -288,6 +273,19 @@ function gameLoop()
         elseif inputNum and betPlaced == 0 then
             betPlaced = math.max(1, math.min(inputNum, maxBetValue))
             successfullyProcessedInput = true
+        elseif betPlaced > 0 and input == "n" then
+            -- Inform backend
+            local message = crypto.hideMessage(getWinAmount(), activeUserId, configSecret)
+            api.updateMoney(configUrl, activeUserId, getWinAmount(), message)
+
+            -- Softer reset
+            totalWin = totalWin + getWinAmount()
+            totalBetted = totalBetted + betPlaced
+            currentRound = 0
+            currentLosingStreak = 0
+            betPlaced = 0
+            oddsToWin = originalOddsToWin
+            userCurrency = 0
         end
 
         -- We are playing
