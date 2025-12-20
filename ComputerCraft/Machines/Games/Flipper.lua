@@ -48,6 +48,9 @@ local oddsToWin = 50
 local originalOddsToWin = 50
 
 local userCurrency = 0
+local totalBetted = 0
+local totalLost = 0
+local totalWin = 0
 
 function clearScreen()
     term.clear()
@@ -69,8 +72,30 @@ function waitForInteraction()
 end
 
 function resetGameState()
+    activeUserId = ""
+    activeUserName = ""
+
+    startingMultipler = 1.9
     workingMultipler = startingMultipler
-    currentLosingStreak = 0.0
+
+    losingStreakIterator = 0.5
+    winningStreakMultipler = 1.45
+    currentLosingStreak = 0
+    currentLosingStreakModifier = 0.0
+    currentWiningStreakModifier = 0.0
+base
+    pot = 0
+    currentRound = 0
+    betPlaced = 0
+    maxBetValue = 1000
+
+    oddsToWin = 50
+    originalOddsToWin = 50
+
+    userCurrency = 0
+    totalBetted = 0
+    totalLost = 0
+    totalWin = 0
 end
 
 function refreshUserInfo()
@@ -104,8 +129,32 @@ function isCardInserted()
     return disk.isPresent("left")
 end
 
+function getMultipler()
+    return ((currentRound * winningStreakMultipler) + startingMultipler + currentLosingStreakModifier)
+end
+
 function presentGameState()
-    print("press enter")
+
+    print("[ Devil's Toss ]")
+    print("Your next flip could double it all " .. activeUserName)
+    print("Cerberus Coin Balance: " .. userCurrency)
+
+    if currentLosingStreakModifier > 0 then
+        print("Losing Streak Comeback Multipler: " .. getMultipler() .. "x")
+    else
+        print("Multiplier: " .. getMultipler() .. "x")
+    end
+
+    if betPlaced == 0 then
+        monitor.print("Player placing bet...")
+        monitor.print("Current Multipler: " .. getMultipler() .. "x")
+
+        print("")
+        print("Type exit to Leave")
+        write("Place your bet: $")
+    else
+        print("")
+    end
 end
 
 function logState()
@@ -118,8 +167,22 @@ function logState()
         losingStreakMod = currentLosingStreakModifier,
         oddsToWin = oddsToWin,
         round = currentRound
+        totalBets = totalBetted,
+        totalLost = totalLost,
+        totalWon = totalWin
     }
-    api.logAction(configUrl, "game", "Flipper", activeUserId, activeUserName, "ping")
+
+    api.logAction(configUrl, "game", "Flipper", activeUserId, activeUserName, gameState)
+end
+
+function flipCoin()
+    local roll = math.random(101)
+
+    local roll <= oddsToWin then
+        print("win")
+    else
+        print("lose")
+    end
 end
 
 function gameLoop()
@@ -130,11 +193,26 @@ function gameLoop()
             break
         end
 
+        math.randomseed(os.time())
+
         refreshUserInfo()
         clearScreen()
 
         presentGameState()
-        read()
+        local input = read()
+
+        -- Leaving
+        if input == "exit" or input == "9" then
+            logState()
+            print("Returning card...")
+            disk.eject("left")
+            break
+        end
+
+        -- We are playing
+        flipCoin()
+
+        logState()
     end
 end
 
