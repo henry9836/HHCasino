@@ -57,37 +57,13 @@ local totalLost = 0
 local totalWin = 0
 
 local function play(filename, originalRate)
-    if not speaker then
-        error("No speaker found")
-    end
- 
-    local upsampleFactor = math.floor(48000 / originalRate + 0.5)
-    if upsampleFactor < 1 then upsampleFactor = 1 end
- 
-    local decoder = dfpwm.make_decoder()
-    local h = fs.open(filename, "rb")
-    if not h then
-        error("File not found: " .. filename)
-    end
- 
-    while true do
-        local chunk = h.read(1024)
-        if not chunk then break end
-        local decoded = decoder(chunk)  -- returns table of bytes
- 
-        -- upsample by repeating each sample
-        local upsampled = {}
-        for i = 1, #decoded do
-            for j = 1, upsampleFactor do
-                upsampled[#upsampled + 1] = decoded[i]
-            end
+    for chunk in io.lines(filename, 16 * 1024) do
+        local buffer = decoder(chunk)
+
+        while not speaker.playAudio(buffer) do
+            os.pullEvent("speaker_audio_empty")
         end
- 
-        speaker.playAudio(upsampled)
-        os.pullEvent("speaker_audio_empty")
     end
- 
-    h.close()
 end
 
 function clearScreen()
@@ -224,7 +200,7 @@ function flipCoin()
     local roll = math.random(101)
 
     clearScreen()
-    monitor.write("FLIPPING COIN...")Win: 🔥🎰 The Devil deals you 
+    monitor.write("FLIPPING COIN...")
     monitor.setCursorPos(1, 2)
     monitor.write("Bet: $" .. betPlaced)
     monitor.setCursorPos(1, 3)
@@ -290,37 +266,4 @@ while true do
     gameLoop()
 
     sleep(0.1)
-end
-local function play(filename, originalRate)
-    if not speaker then
-        error("No speaker found")
-    end
- 
-    local upsampleFactor = math.floor(48000 / originalRate + 0.5)
-    if upsampleFactor < 1 then upsampleFactor = 1 end
- 
-    local decoder = dfpwm.make_decoder()
-    local h = fs.open(filename, "rb")
-    if not h then
-        error("File not found: " .. filename)
-    end
- 
-    while true do
-        local chunk = h.read(1024)
-        if not chunk then break end
-        local decoded = decoder(chunk)  -- returns table of bytes
- 
-        -- upsample by repeating each sample
-        local upsampled = {}
-        for i = 1, #decoded do
-            for j = 1, upsampleFactor do
-                upsampled[#upsampled + 1] = decoded[i]
-            end
-        end
- 
-        speaker.playAudio(upsampled)
-        os.pullEvent("speaker_audio_empty")
-    end
- 
-    h.close()
 end
