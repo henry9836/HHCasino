@@ -134,7 +134,7 @@ function isCardInserted()
 end
 
 function getLosingStreakMultiplier()
-    return losingStreak * losingStreakIterator
+    return currentLosingStreak * losingStreakIterator
 end
 
 function getMultiplier()
