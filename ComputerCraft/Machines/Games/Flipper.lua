@@ -166,7 +166,7 @@ function logState()
         losingStreak = currentLosingStreak,
         losingStreakMod = currentLosingStreakModifier,
         oddsToWin = oddsToWin,
-        round = currentRound
+        round = currentRound,
         totalBets = totalBetted,
         totalLost = totalLost,
         totalWon = totalWin
