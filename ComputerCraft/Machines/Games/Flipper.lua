@@ -7,6 +7,8 @@
 -- 1.9x at the start gives house 5% advantage on first bets
 -- each failed streak adds 0.5x to the the multipler
 -- when the multipler reaches 2.25x cheat chances into favour 55% of coin flips are now casino winning
+-- For each win it multiplies the bet with the current round ((C * 1.45) + 1.9 + losing streak))
+-- at 30x drop the odds to 25%
 
 -- Load Libs
 local api = require("lib.api")
@@ -30,13 +32,22 @@ monitor.write("Devil's Toss is starting, please wait...")
 -- Game values
 local startingMultipler = 1.9
 local workingMultipler = startingMultipler
+
 local losingStreakIterator = 0.5
-local currentLosingStreak = 0.0
+local winningStreakMultipler = 1.45
+local currentLosingStreak = 0
+local currentLosingStreakModifier = 0.0
+local currentWiningStreakModifier = 0.0
+
+local pot = 0
+local currentRound = 0
 local betPlaced = 0
 local maxBetValue = 1000
+
 local oddsToWin = 50
 local originalOddsToWin = 50
-local currencyHeld = 0
+
+local userCurrency = 0
 
 function clearScreen()
     term.clear()
@@ -62,7 +73,7 @@ function resetGameState()
     currentLosingStreak = 0.0
 end
 
-function loadUser()
+function refreshUserInfo()
     if (activeUserId == "") then
         -- Update to what card data is
         local diskFile = fs.open("disk/hadesuser", "r")
@@ -74,21 +85,57 @@ function loadUser()
             sleep(3)
             return false
         end
+    end
 
     local data =  api.getUserInfo(configUrl, activeUserId)
     if data.error then
-            print("Error 9")
-            sleep(3)
-            return false
-        end
-
-        activeUserName = data.Name
-        activeUserId = data.
+        print("Error 9")
+        sleep(3)
+        return false
     end
+
+    activeUserName = data.Name
+    userCurrency = data.Currency
+
+    return true
 end
 
 function isCardInserted()
     return disk.isPresent("left")
+end
+
+function presentGameState()
+    print("press enter")
+end
+
+function logState()
+    local gameState = {
+        currentPot = pot,
+        userWallet = userCurrency,
+        lastBetPlaced = betPlaced,
+        currentMulitper = workingMultipler,
+        losingStreak = currentLosingStreak,
+        losingStreakMod = currentLosingStreakModifier,
+        oddsToWin = oddsToWin,
+        round = currentRound
+    }
+    api.logAction(configUrl, "game", "Flipper", activeUserId, activeUserName, "ping")
+end
+
+function gameLoop()
+    while true do
+        if not isCardInserted() then
+            print("Card not inserted, exiting...")
+            sleep(1)
+            break
+        end
+
+        refreshUserInfo()
+        clearScreen()
+
+        presentGameState()
+        read()
+    end
 end
 
 while true do
@@ -101,6 +148,7 @@ while true do
     inputName = read()
 
     -- Check for disk start game if valid
+    gameLoop()
 
     sleep(0.1)
 end
