@@ -181,6 +181,20 @@ function presentGameState()
 end
 
 function logState()
+    local offsetOdds = 1
+
+    -- at 2.5x odds go down to 45%
+    if getMultiplier() > 2.5 then
+        offsetOdds = offsetOdds + 45
+    end
+
+    -- at 30x odds go to 30%
+    if getMultiplier() > 30 then
+        offsetOdds = offsetOdds + 30
+    end
+
+    local calcOdds = ("50 / " .. (100 + offsetOdds))
+
     local gameState = {
         currentPotValue = getWinAmount(),
         userWallet = userCurrency,
@@ -188,7 +202,7 @@ function logState()
         currentMultipier = workingMultiplier,
         losingStreak = currentLosingStreak,
         losingStreakMod = getLosingStreakMultiplier(),
-        oddsToWin = oddsToWin,
+        oddsToWin = calcOdds,
         round = currentRound,
         totalBets = totalBetted,
         totalLost = totalLost,
