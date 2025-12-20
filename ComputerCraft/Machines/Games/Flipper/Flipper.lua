@@ -180,10 +180,10 @@ function presentGameState()
         monitor.setCursorPos(1, 2)
         monitor.write("Bet: $" .. betPlaced)
         monitor.setCursorPos(1, 3)
-        monitor.write("Next flip: " .. getMultiplier() .. "x")
+        monitor.write("Next flip: " .. getNextMultiplier() .. "x")
 
         print("Cash out value: " .. getWinAmount() .. " Cerberus Coins")
-        print("Let it ride for " .. getMultiplier() .. "x?")
+        print("Let it ride for " .. getNextMultiplier() .. "x?")
         write("[Y/n]? : ")
     end
 end
