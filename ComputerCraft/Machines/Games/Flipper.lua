@@ -146,8 +146,8 @@ function presentGameState()
     end
 
     if betPlaced == 0 then
-        monitor.print("Player placing bet...")
-        monitor.print("Current Multipler: " .. getMultipler() .. "x")
+        monitor.write("Player placing bet...")
+        monitor.write("Current Multipler: " .. getMultipler() .. "x")
 
         print("")
         print("Type exit to Leave")
@@ -178,7 +178,7 @@ end
 function flipCoin()
     local roll = math.random(101)
 
-    local roll <= oddsToWin then
+    if roll <= oddsToWin then
         print("win")
     else
         print("lose")
