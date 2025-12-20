@@ -234,7 +234,12 @@ function flipCoin()
     clearScreen()
     if roll <= oddsToWin then -- WON
         print("The Devil deals you a hot hand, You win!")
-        play("/music/win.dfpwm", 48000)
+
+        if getMultiplier() > 10 then
+            play("/music/bigwin.dfpwm", 48000)
+        else
+            play("/music/win.dfpwm", 48000)
+        end
         
         currentRound = currentRound + 1
     else -- LOSE
