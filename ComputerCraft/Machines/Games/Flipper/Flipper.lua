@@ -47,8 +47,8 @@ local currentRound = 0
 local betPlaced = 0
 local maxBetValue = 5000
 
-local oddsToWin = 50
-local originalOddsToWin = 50
+local oddsToWin = 45
+local originalOddsToWin = 45
 
 local userCurrency = 0
 local totalBetted = 0
@@ -181,19 +181,7 @@ function presentGameState()
 end
 
 function logState()
-    local offsetOdds = 1
-
-    -- at 2.5x odds go down to 45%
-    if getMultiplier() > 2.5 then
-        offsetOdds = offsetOdds + 45
-    end
-
-    -- at 30x odds go to 30%
-    if getMultiplier() > 30 then
-        offsetOdds = offsetOdds + 30
-    end
-
-    local calcOdds = ("50 / " .. (100 + offsetOdds))
+    local calcOdds = (oddsToWin .. " / " .. (100 + getRigging()))
 
     local gameState = {
         currentPotValue = getWinAmount(),
@@ -220,9 +208,8 @@ function getNextMultiplier()
     return (((currentRound + 1) * winningStreakMultiplier) + startingMultiplier + getLosingStreakMultiplier())
 end
 
-function flipCoin()
-
-    -- Cheat the odds
+function getRigging()
+     -- Cheat the odds
     local offset = 1
 
     -- at 2.5x odds go down to 45%
@@ -235,7 +222,11 @@ function flipCoin()
         offset = offset + 30
     end
     
-    local roll = math.random(100 + offset)
+    return offset
+end
+
+function flipCoin()
+    local roll = math.random(100 + getRigging())
 
     clearScreen()
     if (currentRound >= 1) then
