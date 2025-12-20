@@ -264,7 +264,7 @@ function flipCoin()
 
         totalLost = totalLost + betPlaced
         totalBetted = totalBetted + betPlaced
-        local winAmount = getWinAmount()
+        local winAmount = betPlaced
 
         -- Inform backend
         betPlaced = betPlaced * -1
@@ -275,7 +275,7 @@ function flipCoin()
         currentRound = 0
         betPlaced = 0
 
-        flashMonitor("The Devil grins", "The house wins:", betPlaced)
+        flashMonitor("The Devil grins", "The house wins:", winAmount)
     end
 
     return false
