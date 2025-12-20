@@ -193,7 +193,7 @@ function gameLoop()
             break
         end
 
-        math.randomseed(os.time())
+        math.randomseed(os.epoch("utc"))
 
         refreshUserInfo()
         clearScreen()
@@ -213,6 +213,8 @@ function gameLoop()
         flipCoin()
 
         logState()
+
+        sleep(1)
     end
 end
 
