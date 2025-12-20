@@ -28,7 +28,7 @@ local bonusPrices = {
     ["appliedenergistics2:quantum_entangled_singularity"] = 5000
 }
 
-local fallbackPrice = 100
+local fallbackPrice = 500
 local eConstant = math.exp(1)
 
 activeColors = 0

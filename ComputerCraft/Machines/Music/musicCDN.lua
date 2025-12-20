@@ -1,5 +1,6 @@
 -- ffmpeg -i input.wav -ac 1 -ar <sampleRate> output.dfpwm
 -- mpv --audio-samplerate=22000 Hills.dfpwm
+
 local api = require("lib.api")
 local config = require("lib.config")
 local dfpwm = require("cc.audio.dfpwm")
@@ -87,6 +88,7 @@ for i, file in ipairs(playlist) do
 
     term.clear()
     term.setCursorPos(1, 1)
+
     print("Retrieving: " .. file)
 
     local result = api.searchMusicFile(file, configUrl)
