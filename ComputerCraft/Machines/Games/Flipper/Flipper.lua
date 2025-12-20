@@ -185,6 +185,17 @@ end
 function flipCoin()
     local roll = math.random(101)
 
+    clearScreen()
+    monitor.write("FLIPPING COIN...")
+    monitor.setCursorPos(1, 2)
+    monitor.write("Bet: $" .. betPlaced)
+    monitor.setCursorPos(1, 3)
+    monitor.write("Multiplier: " .. getMultiplier() .. "x")
+
+    print("Flipping...")
+
+
+    clearScreen()
     if roll <= oddsToWin then
         print("win")
     else
