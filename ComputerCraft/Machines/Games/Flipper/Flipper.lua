@@ -5,14 +5,15 @@
 
 -- Max bet of 1k
 -- 1.9x at the start gives house 5% advantage on first bets
--- each failed streak adds 0.5x to the the multiplier
--- when the multiplier reaches 2.25x cheat chances into favour 55% of coin flips are now casino winning
+    -- each failed streak adds 0.5x to the the multiplier
+    -- when the multiplier reaches 2.25x cheat chances into favour 55% of coin flips are now casino winning
 -- For each win it multiplies the bet with the current round ((C * 1.45) + 1.9 + losing streak))
 -- at 30x drop the odds to 25%
 
 -- Load Libs
 local api = require("lib.api")
 local config = require("lib.config")
+local crypto = require("lib.crypto")
 local dfpwm = require("cc.audio.dfpwm")
 local speaker = peripheral.find("speaker")
 local decoder = dfpwm.make_decoder()
@@ -35,15 +36,12 @@ monitor.write("Devil's Toss is starting, please wait...")
 
 -- Game values
 local startingMultiplier = 1.9
-local workingMultiplier = startingMultiplier
+local workingMultiplier = 1.9
 
 local losingStreakIterator = 0.5
 local winningStreakMultiplier = 1.45
 local currentLosingStreak = 0
-local currentLosingStreakModifier = 0.0
-local currentWiningStreakModifier = 0.0
 
-local pot = 0
 local currentRound = 0
 local betPlaced = 0
 local maxBetValue = 1000
@@ -89,22 +87,14 @@ function resetGameState()
     activeUserId = ""
     activeUserName = ""
 
-    startingMultiplier = 1.9
     workingMultiplier = startingMultiplier
 
-    losingStreakIterator = 0.5
-    winningStreakMultiplier = 1.45
     currentLosingStreak = 0
-    currentLosingStreakModifier = 0.0
-    currentWiningStreakModifier = 0.0
 
-    pot = 0
     currentRound = 0
     betPlaced = 0
-    maxBetValue = 1000
 
-    oddsToWin = 50
-    originalOddsToWin = 50
+    oddsToWin = originalOddsToWin
 
     userCurrency = 0
     totalBetted = 0
@@ -143,17 +133,20 @@ function isCardInserted()
     return disk.isPresent("left")
 end
 
+function getLosingStreakMultiplier()
+    return losingStreak * losingStreakIterator
+end
+
 function getMultiplier()
-    return ((currentRound * winningStreakMultiplier) + startingMultiplier + currentLosingStreakModifier)
+    return ((currentRound * winningStreakMultiplier) + startingMultiplier + getLosingStreakMultiplier())
 end
 
 function presentGameState()
-
     print("[ Devil's Toss ]")
     print("Your next flip could double it all " .. activeUserName)
     print("Cerberus Coin Balance: " .. userCurrency)
 
-    if currentLosingStreakModifier > 0 then
+    if getLosingStreakMultiplier() > 0 then
         print("Losing Streak Comeback Multiplier: " .. getMultiplier() .. "x")
     else
         print("Multiplier: " .. getMultiplier() .. "x")
@@ -174,18 +167,37 @@ function presentGameState()
         monitor.setCursorPos(1, 2)
         monitor.write("Bet: $" .. betPlaced)
         monitor.setCursorPos(1, 3)
-        monitor.write("Multiplier: " .. getMultiplier() .. "x")
+        monitor.write("Next flip: " .. getMultiplier() .. "x")
+
+        print("Cash out value: " .. getWinAmount() .. " Cerberus Coins")
+        print("Let it ride for " .. getMultiplier() .. "x?")
+        print("[Y/n]? : ")
+        local choice = read()
+        if choice == "n" then
+            -- Inform backend
+            local message = crypto.hideMessage(getWinAmount(), activeUserId, configSecret)
+            api.updateMoney(configUrl, activeUserId, getWinAmount(), message)
+
+            -- Softer reset
+            totalWin = totalWin + getWinAmount()
+            totalBetted = totalBetted + betPlaced
+            currentRound = 0
+            currentLosingStreak = 0
+            betPlaced = 0
+            oddsToWin = originalOddsToWin
+            userCurrency = 0
+        end
     end
 end
 
 function logState()
     local gameState = {
-        currentPot = pot,
+        currentPotValue = getWinAmount(),
         userWallet = userCurrency,
         lastBetPlaced = betPlaced,
         currentMultipier = workingMultiplier,
         losingStreak = currentLosingStreak,
-        losingStreakMod = currentLosingStreakModifier,
+        losingStreakMod = getLosingStreakMultiplier(),
         oddsToWin = oddsToWin,
         round = currentRound,
         totalBets = totalBetted,
@@ -194,6 +206,14 @@ function logState()
     }
 
     api.logAction(configUrl, "game", "Flipper", activeUserId, activeUserName, gameState)
+end
+
+function getWinAmount()
+    return betPlaced * getMultiplier()
+end
+
+function getNextMultiplier()
+    return (((currentRound + 1) * winningStreakMultiplier) + startingMultiplier + getLosingStreakMultiplier())
 end
 
 function flipCoin()
@@ -210,14 +230,33 @@ function flipCoin()
 
     play("/music/flip.dfpwm", 48000)
 
+    sleep(1)
+
     clearScreen()
-    if roll <= oddsToWin then
+    if roll <= oddsToWin then -- WON
         print("The Devil deals you a hot hand, You win!")
         play("/music/win.dfpwm", 48000)
-    else
+        
+        currentRound = currentRound + 1
+        losingStreak = 0
+    else -- LOSE
         print("The Devil grins, the house wins")
         play("/music/lose.dfpwm", 48000)
+        
+        totalLost = totalLost + betPlaced
+        totalBetted = totalBetted + betPlaced
+
+        -- Inform backend
+        betPlaced = betPlaced * -1
+        local message = crypto.hideMessage(betPlaced, activeUserId, configSecret)
+        api.updateMoney(configUrl, activeUserId, betPlaced, message)
+
+        losingStreak = losingStreak + 1
+        currentRound = 0
+        betPlaced = 0
     end
+
+    return false
 end
 
 function gameLoop()
@@ -235,19 +274,27 @@ function gameLoop()
 
         presentGameState()
         local input = read()
+        local inputNum = tonumber(input)
 
         -- Leaving
+        local successfullyProcessedInput = false
         if input == "exit" or input == "9" then
             logState()
+
             print("Returning card...")
             disk.eject("left")
             break
+        -- Have we inputted a number and not have a bet placed yet, must be starting
+        elseif inputNum and betPlaced == 0 then
+            betPlaced = math.max(1, math.min(inputNum, maxBetValue))
+            successfullyProcessedInput = true
         end
 
         -- We are playing
-        flipCoin()
-
-        logState()
+        if successfullyProcessedInput then
+            flipCoin()
+            logState()
+        end
 
         sleep(1)
     end
