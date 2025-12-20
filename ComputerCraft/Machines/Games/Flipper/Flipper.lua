@@ -202,7 +202,21 @@ function getNextMultiplier()
 end
 
 function flipCoin()
-    local roll = math.random(101)
+
+    -- Cheat the odds
+    local offset = 1
+
+    -- at 2.5x odds go down to 45%
+    if getMultiplier() > 2.5 then
+        offset = offset + 45
+    end
+
+    -- at 30x odds go to 30%
+    if getMultiplier() > 30 then
+        offset = offset + 30
+    end
+    
+    local roll = math.random(100 + offset)
 
     clearScreen()
     monitor.write("FLIPPING COIN...")
