@@ -28,7 +28,6 @@ local sampleRate = 48000
 
 -- Computer Monitor
 local monitor = peripheral.find("monitor")
-monitor.clear()
 monitor.setTextScale(2)
 monitor.setBackgroundColor(colors.black)
 monitor.setTextColor(colors.red)
@@ -251,7 +250,6 @@ function flipCoin()
 
         currentRound = currentRound + 1
 
-        monitor.clear()
         monitor.setCursorPos(1, 1)
         monitor.write(username)
         monitor.setCursorPos(1, 2)
@@ -274,7 +272,6 @@ function flipCoin()
         currentRound = 0
         betPlaced = 0
 
-        monitor.clear()
         monitor.setCursorPos(1, 1)
         monitor.write("The Devil grins")
         monitor.setCursorPos(1, 2)
@@ -357,6 +354,8 @@ function gameLoop()
         sleep(1)
     end
 end
+
+sleep(1)
 
 while true do
     -- Reset
