@@ -342,7 +342,9 @@ function gameLoop()
         -- Have we inputted a number and not have a bet placed yet, must be starting
         elseif inputNum and betPlaced == 0 then
             betPlaced = math.floor(math.min(math.max(1, math.min(inputNum, maxBetValue)), userCurrency))
-            successfullyProcessedInput = true
+            if betPlaced > 0 then
+                successfullyProcessedInput = true
+            end
         elseif betPlaced > 0 and input == "n" then
             -- Inform backend
             local message = crypto.hideMessage(getWinAmount(), activeUserId, configSecret)
