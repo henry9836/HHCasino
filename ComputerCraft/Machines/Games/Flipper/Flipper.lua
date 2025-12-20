@@ -42,6 +42,7 @@ local workingMultiplier = 1.9
 local losingStreakIterator = 0.35
 local winningStreakMultiplier = 1.35
 local currentLosingStreak = 0
+local maxLosingStreakMultipler = 2.4
 
 local currentRound = 0
 local betPlaced = 0
@@ -139,7 +140,8 @@ function isCardInserted()
 end
 
 function getLosingStreakMultiplier()
-    return currentLosingStreak * losingStreakIterator
+
+    return math.min(currentLosingStreak * losingStreakIterator, maxLosingStreakMultipler)
 end
 
 function getMultiplier()
