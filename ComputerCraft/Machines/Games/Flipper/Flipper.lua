@@ -39,8 +39,8 @@ monitor.write("Devil's Toss is starting, please wait...")
 local startingMultiplier = 1.9
 local workingMultiplier = 1.9
 
-local losingStreakIterator = 0.5
-local winningStreakMultiplier = 1.45
+local losingStreakIterator = 0.35
+local winningStreakMultiplier = 1.35
 local currentLosingStreak = 0
 
 local currentRound = 0
