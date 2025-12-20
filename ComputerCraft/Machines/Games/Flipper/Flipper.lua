@@ -251,7 +251,7 @@ function flipCoin()
         end
 
         currentRound = currentRound + 1
-        flashMonitor(username, "Won: " .. getWinAmount() .. "!", "")
+        flashMonitor(activeUserName, "Won: " .. getWinAmount() .. "!", "")
 
     else -- LOSE
         print("The Devil grins, the house wins")
