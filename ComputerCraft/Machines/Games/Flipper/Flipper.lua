@@ -321,7 +321,10 @@ function gameLoop()
 
         math.randomseed(os.epoch("utc"))
 
-        refreshUserInfo()
+        if not refreshUserInfo() then
+            break
+        end
+        
         clearScreen()
 
         presentGameState()
@@ -330,7 +333,7 @@ function gameLoop()
 
         -- Leaving
         local successfullyProcessedInput = false
-        if input == "exit" or input == "9" then
+        if input == "exit" then
             logState()
 
             print("Returning card...")
