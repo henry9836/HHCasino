@@ -262,6 +262,18 @@ app.post('/register', async (req, res) => {
     }
 });
 
+app.post('/logaction', async (req, res) => {
+    console.log("Logged manual action");
+
+    const { actionType, machine, userId, username, value } = req.body;
+    if (actionType === undefined || machine === undefined || userId === undefined || username === undefined || value === undefined) {
+        return res.status(401).json({error: "json body must be valid"});
+    }
+
+    logAction({"message" : actionType, "userId" : userId, "username" : username, "machine" : machine, "value" : value});
+    return res.status(200).json({status: "success"});
+});
+
 app.post('/vault', async (req, res) => {
     console.log("/vault");
     const { items } = req.body;
@@ -345,8 +357,6 @@ app.post('/update', async (req, res) => {
         if (conn) await conn.release();
     }
 });
-
-// TODO: Get Currency To Item Ratios
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
