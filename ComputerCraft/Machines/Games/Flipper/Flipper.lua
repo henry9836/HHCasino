@@ -161,7 +161,7 @@ function presentGameState()
 
         print("")
         print("Type exit to Leave")
-        write("Place your bet: $")
+        write("Place your bet: (max " .. maxBetValue ..")$")
     else
         monitor.write(activeUserName)
         monitor.setCursorPos(1, 2)
@@ -223,7 +223,6 @@ function flipCoin()
         play("/music/win.dfpwm", 48000)
         
         currentRound = currentRound + 1
-        losingStreak = 0
     else -- LOSE
         print("The Devil grins, the house wins")
         play("/music/lose.dfpwm", 48000)
@@ -236,7 +235,7 @@ function flipCoin()
         local message = crypto.hideMessage(betPlaced, activeUserId, configSecret)
         api.updateMoney(configUrl, activeUserId, betPlaced, message)
 
-        losingStreak = losingStreak + 1
+        currentLosingStreak = currentLosingStreak + 1
         currentRound = 0
         betPlaced = 0
     end
@@ -286,6 +285,8 @@ function gameLoop()
             betPlaced = 0
             oddsToWin = originalOddsToWin
             userCurrency = 0
+        elseif betPlaced > 0 then -- if we have a betting amount and we got here then we want to flip
+            successfullyProcessedInput = true
         end
 
         -- We are playing
