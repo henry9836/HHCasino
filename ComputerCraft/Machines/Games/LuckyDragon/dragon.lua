@@ -322,7 +322,7 @@ function gameLoop()
             end
         end
         
-        sleep(0.5)
+        sleep(0.1)
     end
 end
 
