@@ -270,7 +270,7 @@ function flipCoin()
         currentRound = 0
         betPlaced = 0
 
-        flashMonitor("The Devil grins", "the house wins:", winAmount)
+        flashMonitor("The Devil grins", "The house wins:", betPlaced)
     end
 
     return false
