@@ -79,11 +79,12 @@ function waitForInteraction()
     clearScreen()
 
     monitor.setTextScale(3)
-    monitor.write("Devil's Toss")
+    monitor.write("[ Devil's Toss ]")
     monitor.setTextScale(1)
     monitor.setCursorPos(1, 2)
-    monitor.write("Your next flip could double it all")
-    monitor.setTextScale(2)
+    monitor.write("Your next flip could")
+    monitor.setCursorPos(1, 3)
+    monitor.write("double it all!")
 end
 
 function resetGameState()
