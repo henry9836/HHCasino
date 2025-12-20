@@ -45,7 +45,7 @@ local currentLosingStreak = 0
 
 local currentRound = 0
 local betPlaced = 0
-local maxBetValue = 10000
+local maxBetValue = 5000
 
 local oddsToWin = 50
 local originalOddsToWin = 50
