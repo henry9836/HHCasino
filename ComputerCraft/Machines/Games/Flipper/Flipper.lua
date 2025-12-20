@@ -28,6 +28,8 @@ local sampleRate = 48000
 
 -- Computer Monitor
 local monitor = peripheral.find("monitor")
+monitor.clear()
+monitor.setCursorPos(1, 1)
 monitor.setTextScale(2)
 monitor.setBackgroundColor(colors.black)
 monitor.setTextColor(colors.red)
@@ -67,6 +69,7 @@ function clearScreen()
     term.clear()
     monitor.clear()
 
+    monitor.setTextScale(1)
     monitor.setBackgroundColor(colors.black)
     monitor.setTextColor(colors.red)
 
@@ -77,9 +80,8 @@ end
 function waitForInteraction()
     clearScreen()
 
-    monitor.setTextScale(3)
+    monitor.setTextScale(2)
     monitor.write("[ Devil's Toss ]")
-    monitor.setTextScale(1)
     monitor.setCursorPos(1, 2)
     monitor.write("Your next flip could")
     monitor.setCursorPos(1, 3)
@@ -263,6 +265,13 @@ function flipCoin()
         totalLost = totalLost + betPlaced
         totalBetted = totalBetted + betPlaced
 
+        monitor.setCursorPos(1, 1)
+        monitor.write("The Devil grins")
+        monitor.setCursorPos(1, 2)
+        monitor.write("the house wins:")
+        monitor.setCursorPos(1, 3)
+        monitor.write(getWinAmount())
+
         -- Inform backend
         betPlaced = betPlaced * -1
         local message = crypto.hideMessage(betPlaced, activeUserId, configSecret)
@@ -272,12 +281,6 @@ function flipCoin()
         currentRound = 0
         betPlaced = 0
 
-        monitor.setCursorPos(1, 1)
-        monitor.write("The Devil grins")
-        monitor.setCursorPos(1, 2)
-        monitor.write("the house wins:")
-        monitor.setCursorPos(1, 3)
-        monitor.write(getWinAmount())
         flashMonitor()
     end
 
@@ -286,15 +289,15 @@ end
 
 function flashMonitor()
     for i = 1, 3 do
+        -- Black text on red background
+        monitor.setBackgroundColor(colors.red)
+        monitor.setTextColor(colors.black)
+        os.sleep(0.25)
+
         -- Red text on black background
         monitor.setBackgroundColor(colors.black)
         monitor.setTextColor(colors.red)
         
-        os.sleep(0.25)
-        
-        -- Black text on red background
-        monitor.setBackgroundColor(colors.red)
-        monitor.setTextColor(colors.black)
         os.sleep(0.25)
     end
 end
