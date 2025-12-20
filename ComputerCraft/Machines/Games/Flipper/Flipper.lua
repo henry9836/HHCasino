@@ -324,7 +324,7 @@ function gameLoop()
         if not refreshUserInfo() then
             break
         end
-        
+
         clearScreen()
 
         presentGameState()
@@ -341,7 +341,7 @@ function gameLoop()
             break
         -- Have we inputted a number and not have a bet placed yet, must be starting
         elseif inputNum and betPlaced == 0 then
-            betPlaced = math.max(1, math.min(inputNum, maxBetValue))
+            betPlaced = math.min(math.max(1, math.min(inputNum, maxBetValue)), userCurrency)
             successfullyProcessedInput = true
         elseif betPlaced > 0 and input == "n" then
             -- Inform backend
