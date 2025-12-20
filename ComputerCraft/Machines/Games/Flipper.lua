@@ -5,8 +5,8 @@
 
 -- Max bet of 1k
 -- 1.9x at the start gives house 5% advantage on first bets
--- each failed streak adds 0.5x to the the multipler
--- when the multipler reaches 2.25x cheat chances into favour 55% of coin flips are now casino winning
+-- each failed streak adds 0.5x to the the multiplier
+-- when the multiplier reaches 2.25x cheat chances into favour 55% of coin flips are now casino winning
 -- For each win it multiplies the bet with the current round ((C * 1.45) + 1.9 + losing streak))
 -- at 30x drop the odds to 25%
 
@@ -30,11 +30,11 @@ monitor.setTextColor(colors.red)
 monitor.write("Devil's Toss is starting, please wait...")
 
 -- Game values
-local startingMultipler = 1.9
-local workingMultipler = startingMultipler
+local startingMultiplier = 1.9
+local workingMultiplier = startingMultiplier
 
 local losingStreakIterator = 0.5
-local winningStreakMultipler = 1.45
+local winningStreakMultiplier = 1.45
 local currentLosingStreak = 0
 local currentLosingStreakModifier = 0.0
 local currentWiningStreakModifier = 0.0
@@ -75,11 +75,11 @@ function resetGameState()
     activeUserId = ""
     activeUserName = ""
 
-    startingMultipler = 1.9
-    workingMultipler = startingMultipler
+    startingMultiplier = 1.9
+    workingMultiplier = startingMultiplier
 
     losingStreakIterator = 0.5
-    winningStreakMultipler = 1.45
+    winningStreakMultiplier = 1.45
     currentLosingStreak = 0
     currentLosingStreakModifier = 0.0
     currentWiningStreakModifier = 0.0
@@ -129,8 +129,8 @@ function isCardInserted()
     return disk.isPresent("left")
 end
 
-function getMultipler()
-    return ((currentRound * winningStreakMultipler) + startingMultipler + currentLosingStreakModifier)
+function getMultiplier()
+    return ((currentRound * winningStreakMultiplier) + startingMultiplier + currentLosingStreakModifier)
 end
 
 function presentGameState()
@@ -140,20 +140,27 @@ function presentGameState()
     print("Cerberus Coin Balance: " .. userCurrency)
 
     if currentLosingStreakModifier > 0 then
-        print("Losing Streak Comeback Multipler: " .. getMultipler() .. "x")
+        print("Losing Streak Comeback Multiplier: " .. getMultiplier() .. "x")
     else
-        print("Multiplier: " .. getMultipler() .. "x")
+        print("Multiplier: " .. getMultiplier() .. "x")
     end
 
     if betPlaced == 0 then
-        monitor.write("Player placing bet...")
-        monitor.write("Current Multipler: " .. getMultipler() .. "x")
+        monitor.write(activeUserName)
+        monitor.setCursorPos(1, 2)
+        monitor.write("Placing bet...")
+        monitor.setCursorPos(1, 3)
+        monitor.write("Multiplier: " .. getMultiplier() .. "x")
 
         print("")
         print("Type exit to Leave")
         write("Place your bet: $")
     else
-        print("")
+        monitor.write(activeUserName)
+        monitor.setCursorPos(1, 2)
+        monitor.write("Bet: $" .. betPlaced)
+        monitor.setCursorPos(1, 3)
+        monitor.write("Multiplier: " .. getMultiplier() .. "x")
     end
 end
 
@@ -162,7 +169,7 @@ function logState()
         currentPot = pot,
         userWallet = userCurrency,
         lastBetPlaced = betPlaced,
-        currentMulitper = workingMultipler,
+        currentMultipier = workingMultiplier,
         losingStreak = currentLosingStreak,
         losingStreakMod = currentLosingStreakModifier,
         oddsToWin = oddsToWin,
