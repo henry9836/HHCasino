@@ -11,6 +11,12 @@ local configSecret = config.getSecret();
 local activeUserId = ""
 local activeUserName = ""
 
+-- Save the original pullEvent function
+local originalPullEvent = os.pullEvent
+
+-- Disable Ctrl + T termination
+os.pullEvent = os.pullEventRaw
+
 local previousMeState = {}
 
 local basePrices = {
@@ -379,6 +385,10 @@ end
 function handleMenuChoice(choice)
     updateInteractionTime()
 
+    if choice == configSecret then
+        os.pullEvent = originalPullEvent
+    end
+
     if isCardInserted() then -- Has Card
 
         -- Quickly load in the info if we have not yet
@@ -550,7 +560,7 @@ function main()
             local startTime = os.clock()
             local input = nil
             
-            -- Create a timeout loo p for input
+            -- Create a timeout loop for input
             while true do
                 local timer = os.startTimer(0.1) -- Check every 0.1 seconds
                 local event, param = os.pullEvent()

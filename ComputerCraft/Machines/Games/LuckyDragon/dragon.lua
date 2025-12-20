@@ -5,6 +5,12 @@ local dfpwm = require("cc.audio.dfpwm")
 local speaker = peripheral.find("speaker")
 local decoder = dfpwm.make_decoder()
 
+-- Save the original pullEvent function
+local originalPullEvent = os.pullEvent
+
+-- Disable Ctrl + T termination
+os.pullEvent = os.pullEventRaw
+
 -- Load Config Data
 local configUrl = config.getApiUrl();
 local configSecret = config.getSecret();
@@ -330,6 +336,10 @@ function waitForInteraction()
     print(" [ LUCKY DRAGON ]")
     print("Insert Hades Card then press enter to continue")
     inputName = read()
+
+    if inputName == configSecret then
+        os.pullEvent = originalPullEvent
+    end
 end
 
 while true do

@@ -22,6 +22,12 @@ local decoder = dfpwm.make_decoder()
 local configUrl = config.getApiUrl();
 local configSecret = config.getSecret();
 
+-- Save the original pullEvent function
+local originalPullEvent = os.pullEvent
+
+-- Disable Ctrl + T termination
+os.pullEvent = os.pullEventRaw
+
 local activeUserId = ""
 local activeUserName = ""
 local sampleRate = 48000
@@ -382,6 +388,10 @@ while true do
 
     print("Insert Hades Card then press enter to continue")
     inputName = read()
+
+    if inputName == configSecret then
+        os.pullEvent = originalPullEvent
+    end
 
     -- Check for disk start game if valid
     gameLoop()
