@@ -251,12 +251,7 @@ function flipCoin()
         end
 
         currentRound = currentRound + 1
-
-        monitor.setCursorPos(1, 1)
-        monitor.write(username)
-        monitor.setCursorPos(1, 2)
-        monitor.write("Won: " .. getWinAmount() .. "!")
-        flashMonitor()
+        flashMonitor(username, "Won: " .. getWinAmount() .. "!", "")
 
     else -- LOSE
         print("The Devil grins, the house wins")
@@ -264,13 +259,7 @@ function flipCoin()
 
         totalLost = totalLost + betPlaced
         totalBetted = totalBetted + betPlaced
-
-        monitor.setCursorPos(1, 1)
-        monitor.write("The Devil grins")
-        monitor.setCursorPos(1, 2)
-        monitor.write("the house wins:")
-        monitor.setCursorPos(1, 3)
-        monitor.write(getWinAmount())
+        local winAmount = getWinAmount()
 
         -- Inform backend
         betPlaced = betPlaced * -1
@@ -281,23 +270,36 @@ function flipCoin()
         currentRound = 0
         betPlaced = 0
 
-        flashMonitor()
+        flashMonitor("The Devil grins", "the house wins:", winAmount)
     end
 
     return false
 end
 
-function flashMonitor()
+function flashMonitor(line1, line2, line3)
     for i = 1, 3 do
         -- Black text on red background
         monitor.setBackgroundColor(colors.red)
         monitor.setTextColor(colors.black)
+        monitor.clear()
+        monitor.setCursorPos(1, 1)
+        monitor.write(line1)
+        monitor.setCursorPos(1, 2)
+        monitor.write(line2)
+        monitor.setCursorPos(1, 3)
+        monitor.write(line3)
         os.sleep(0.25)
 
         -- Red text on black background
         monitor.setBackgroundColor(colors.black)
         monitor.setTextColor(colors.red)
-        
+        monitor.clear()
+        monitor.setCursorPos(1, 1)
+        monitor.write(line1)
+        monitor.setCursorPos(1, 2)
+        monitor.write(line2)
+        monitor.setCursorPos(1, 3)
+        monitor.write(line3)
         os.sleep(0.25)
     end
 end
