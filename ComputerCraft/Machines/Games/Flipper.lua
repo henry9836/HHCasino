@@ -62,6 +62,35 @@ function resetGameState()
     currentLosingStreak = 0.0
 end
 
+function loadUser()
+    if (activeUserId == "") then
+        -- Update to what card data is
+        local diskFile = fs.open("disk/hadesuser", "r")
+        activeUserId = diskFile.readAll()
+        diskFile.close()
+
+        if (activeUserId == "") then
+            print("Error 8")
+            sleep(3)
+            return false
+        end
+
+    local data =  api.getUserInfo(configUrl, activeUserId)
+    if data.error then
+            print("Error 9")
+            sleep(3)
+            return false
+        end
+
+        activeUserName = data.Name
+        activeUserId = data.
+    end
+end
+
+function isCardInserted()
+    return disk.isPresent("left")
+end
+
 while true do
     -- Reset
     clearScreen()

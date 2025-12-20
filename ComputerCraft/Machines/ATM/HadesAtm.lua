@@ -225,20 +225,24 @@ function calculateIncome(vaultChange)
 
     for _, itemData in pairs(vaultChange) do
         local itemName = itemData.name
-        local deltaAmount = itemData.difference
-        local itemBasePrice = basePrices[itemName] or fallbackPrice
-        local itemBonusPrice = bonusPrices[itemName] or 0
-        local currentAmount = previousMeState[itemName] or 0
 
-        -- Get current price of current amount
-        local currentPrice = getScaledValue(itemBasePrice, deltaAmount, itemBonusPrice)
+        -- Only process items that do NOT contain "microblock"
+        if not string.find(itemName:lower(), "microblock") then
+            local deltaAmount = itemData.difference
+            local itemBasePrice = basePrices[itemName] or fallbackPrice
+            local itemBonusPrice = bonusPrices[itemName] or 0
+            local currentAmount = previousMeState[itemName] or 0
 
-        -- Multiply it by diff
-        local diffPrice = currentPrice * deltaAmount;
-        print(itemName .. " @ " .. currentPrice .. " x" .. deltaAmount .. " : "  .. diffPrice)
+            -- Get current price of current amount
+            local currentPrice = getScaledValue(itemBasePrice, deltaAmount, itemBonusPrice)
 
-        -- Effect total
-        totalIncome = totalIncome + diffPrice
+            -- Multiply it by diff
+            local diffPrice = currentPrice * deltaAmount;
+            print(itemName .. " @ " .. currentPrice .. " x" .. deltaAmount .. " : "  .. diffPrice)
+
+            -- Effect total
+            totalIncome = totalIncome + diffPrice
+        end
     end
 
     return totalIncome
@@ -425,8 +429,7 @@ function handleMenuChoice(choice)
             print("")
             print("!!! ====== WARNING ====== !!!\n")
             print("DO NOT press enter until the chest is EMPTY.\n")
-            print("If you press enter before the chest is empty, items may NOT be deposited into your account!\n")
-            print("Once you have placed everything and the chest is empty, press enter to continue safely.\n")
+            print("Once you the chest is empty, press enter to continue.\n")
             print("!!! ====== WARNING ====== !!!\n")
             print("")
             print("Press enter to continue when chest is empty")
