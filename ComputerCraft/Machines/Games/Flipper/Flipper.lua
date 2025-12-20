@@ -213,7 +213,7 @@ function logState()
 end
 
 function getWinAmount()
-    return betPlaced * getMultiplier()
+    return math.floor(betPlaced * getMultiplier())
 end
 
 function getNextMultiplier()
